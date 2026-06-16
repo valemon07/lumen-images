@@ -1,0 +1,36 @@
+import { getImagesPerUser, getTestItems } from "../lib/data";
+
+export default async function Page() {
+  const images = await getImagesPerUser({
+    id: 2,
+    name: "test",
+    email: "test",
+    emailVerified: new Date(8.64e15),
+    image: "why is this text",
+  });
+  const testItems = await getTestItems();
+  return (
+    <main className="flex flex-col justify-center items-center h-screen w-screen">
+      <div>
+        <p>Images:</p>
+        <div className="flex flex-row">
+          {images.map((image) => {
+            return <div key={image.id}>{image.s3_url}</div>;
+          })}
+        </div>
+      </div>
+      <div>
+        <p>Test items:</p>
+        <div className="flex flex-row px-2 py-2 justify-center items-center">
+          {testItems.map((test) => {
+            return (
+              <div className="px-2" key={test.id}>
+                {test.name}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </main>
+  );
+}
