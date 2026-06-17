@@ -1,34 +1,17 @@
-import sql from "@/app/lib/db";
-import { z } from "zod";
+"use client";
+
+import { createTestObject } from "./_insert";
+import "@mantine/dropzone/styles.css";
+import { Group, Text } from "@mantine/core";
+import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
+import { uploadImage } from "@/app/lib/actions";
 
 export default function Page() {
-  async function createTestObject(formData: FormData) {
-    "use server";
-
-    const schema = z.object({
-      name: z.string({}),
-    });
-    const validatedFields = schema.safeParse({
-      name: formData.get("name"),
-    });
-    if (!validatedFields.success) {
-      return;
-    }
-
-    const { name } = validatedFields.data;
-
-    try {
-      await sql`
-        INSERT INTO test_items(name) VALUES (${name})
-        `;
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
-
   return (
-    <main className="flex justify-center items-center">
+    <main className="flex-col justify-center items-center">
       <form
         action={createTestObject}
         className="flex flex-col justify-center items-center"
@@ -46,8 +29,43 @@ export default function Page() {
           value="create new test"
           type="submit"
           className="border-x border-y border-zinc-400 bg-zinc-600"
-        ></input>
+        />
       </form>
+      <Dropzone
+        onDrop={(files) => {
+          uploadImage(files);
+        }}
+        onReject={(files) => {
+          console.log("Rejected files", files);
+        }}
+        maxSize={10 * 1024 ** 2}
+        accept={IMAGE_MIME_TYPE}
+      >
+        <Group
+          justify="center"
+          gap="xl"
+          mih={220}
+          style={{ pointerEvents: "none" }}
+        >
+          <Dropzone.Accept>
+            <ArrowUpTrayIcon className="top-1/2 h-10 w-10" />
+          </Dropzone.Accept>
+          <Dropzone.Reject>
+            <XMarkIcon className="top-1/2 h-10 w-10" />
+          </Dropzone.Reject>
+          <Dropzone.Idle>
+            <PhotoIcon className="top-1/2 h-10 w-10" />
+          </Dropzone.Idle>
+          <div>
+            <Text size="xl" inline>
+              Drag images here or click to select files
+            </Text>
+            <Text size="sm" c="dimmed" inline mt={7}>
+              Attach as many files as you like, each file should not exceed 5mb
+            </Text>
+          </div>
+        </Group>
+      </Dropzone>
     </main>
   );
 }
