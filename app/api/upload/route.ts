@@ -6,9 +6,16 @@ export async function POST(request: Request) {
   const { filename, contentType } = await request.json();
 
   try {
-    const client = new S3Client({ region: process.env.AWS_REGION });
+    const region = process.env.AWS_REGION;
+    const bucket = process.env.AWS_BUCKET_NAME;
+
+    if (!region || !bucket) {
+      return Response.json({ error: 'Missing AWS_REGION or AWS_BUCKET_NAME' }, { status: 500 });
+    }
+
+    const client = new S3Client({ region });
     const { url, fields } = await createPresignedPost(client, {
-      Bucket: process.env.AWS_BUCKET_NAME,
+      Bucket: bucket,
       Key: uuidv4(),
       Conditions: [
         ["content-length-range", 0, 10485760], // up to 10 MB
