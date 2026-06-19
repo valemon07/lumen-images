@@ -1,14 +1,20 @@
 "use client";
 
+import { uploadImage } from "@/app/lib/actions";
+import {
+  ArrowUpTrayIcon,
+  PhotoIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { Group, Text } from "@mantine/core";
+import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import "@mantine/dropzone/styles.css";
 import { useState } from "react";
 
 export default function Page() {
-  const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = async (file: File) => {
     if (!file) {
       alert("Please select a file to upload.");
       return;
@@ -57,22 +63,43 @@ export default function Page() {
   return (
     <main>
       <h1>Upload a File to S3</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          id="file"
-          type="file"
-          onChange={(e) => {
-            const files = e.target.files;
-            if (files) {
-              setFile(files[0]);
-            }
-          }}
-          accept="image/png, image/jpeg"
-        />
-        <button type="submit" disabled={uploading}>
-          Upload
-        </button>
-      </form>
+      <Dropzone
+        onDrop={(files) => {
+          files.map((file) => {
+            handleSubmit(file);
+          });
+        }}
+        onReject={(files) => {
+          console.log("Rejected files", files);
+        }}
+        maxSize={10 * 1024 ** 2}
+        accept={IMAGE_MIME_TYPE}
+      >
+        <Group
+          justify="center"
+          gap="xl"
+          mih={220}
+          style={{ pointerEvents: "none" }}
+        >
+          <Dropzone.Accept>
+            <ArrowUpTrayIcon className="top-1/2 h-10 w-10" />
+          </Dropzone.Accept>
+          <Dropzone.Reject>
+            <XMarkIcon className="top-1/2 h-10 w-10" />
+          </Dropzone.Reject>
+          <Dropzone.Idle>
+            <PhotoIcon className="top-1/2 h-10 w-10" />
+          </Dropzone.Idle>
+          <div>
+            <Text size="xl" inline>
+              Drag images here or click to select files
+            </Text>
+            <Text size="sm" c="dimmed" inline mt={7}>
+              Attach as many files as you like, each file should not exceed 5mb
+            </Text>
+          </div>
+        </Group>
+      </Dropzone>
     </main>
   );
 }
