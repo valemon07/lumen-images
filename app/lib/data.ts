@@ -1,3 +1,5 @@
+"use server";
+
 import { User, Image, TestType } from "@/app/lib/types";
 import sql from "./db";
 

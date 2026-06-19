@@ -2,8 +2,9 @@ export type User = {
   id: number;
   name: string;
   email: string;
-  emailVerified: Date;
-  image: string;
+  emailVerified: Date | null;
+  image: string | null;
+  password_hash: string;
 };
 
 export type Image = {
