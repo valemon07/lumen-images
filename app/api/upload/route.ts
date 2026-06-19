@@ -10,7 +10,10 @@ export async function POST(request: Request) {
     const bucket = process.env.AWS_BUCKET_NAME;
 
     if (!region || !bucket) {
-      return Response.json({ error: 'Missing AWS_REGION or AWS_BUCKET_NAME' }, { status: 500 });
+      return Response.json(
+        { error: "Missing AWS_REGION or AWS_BUCKET_NAME" },
+        { status: 500 },
+      );
     }
 
     const client = new S3Client({ region });
@@ -27,6 +30,7 @@ export async function POST(request: Request) {
       },
       Expires: 600, // Seconds before the presigned post expires. 3600 by default.
     });
+    console.log(url);
 
     return Response.json({ url, fields });
   } catch (error) {
