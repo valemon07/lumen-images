@@ -61,7 +61,7 @@ export default function Page() {
   };
 
   return (
-    <main>
+    <main className="flex flex-col justify-center items-center h-screen">
       <h1>Upload a File to S3</h1>
       <Dropzone
         onDrop={(files) => {
