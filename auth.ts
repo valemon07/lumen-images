@@ -5,7 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import z from "zod";
 import bcrypt from "bcrypt";
-import { getUser } from "./app/lib/data";
+import { getUserByEmail } from "./app/lib/user-actions";
 
 const pool = new Pool({
   host: process.env.DATABASE_HOST,
@@ -32,9 +32,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
-          const user = await getUser(email);
+          const user = await getUserByEmail(email);
           if (!user) return null;
-          const passwordsMatch = await bcrypt.compare(password, user.password);
+          const passwordsMatch = await bcrypt.compare(
+            password,
+            user.password_hash,
+          );
 
           if (passwordsMatch) return user;
         }

@@ -1,13 +1,26 @@
+"use client";
+
 import {
   AtSymbolIcon,
   KeyIcon,
   ArrowRightIcon,
+  ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "./button";
+import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+import { authenticate } from "../lib/user-actions";
 
 export default function LoginForm() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/home";
+  const [errorMessage, formAction, isPending] = useActionState(
+    authenticate,
+    undefined,
+  );
+
   return (
-    <form className="space-y-3">
+    <form action={formAction} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-600 px-6 pb-4 pt-8">
         <h1>Login Here</h1>
         <div className="w-full">
@@ -50,7 +63,7 @@ export default function LoginForm() {
             </div>
           </div>
         </div>
-        {/*<input type="hidden" name="redirectTo" value={callbackUrl} />*/}
+        <input type="hidden" name="redirectTo" value={callbackUrl} />
         <Button className="mt-4 w-full">
           Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
@@ -59,13 +72,12 @@ export default function LoginForm() {
           aria-live="polite"
           aria-atomic="true"
         >
-          {/*{errorMessage && (
+          {errorMessage && (
             <>
               <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
               <p className="text-sm text-red-500">{errorMessage}</p>
             </>
           )}
-          */}
         </div>
       </div>
     </form>
