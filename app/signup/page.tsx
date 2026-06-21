@@ -1,11 +1,11 @@
 "use client";
 import { Button } from "../ui/button";
-import { createUser, UserState } from "../lib/user-actions";
+import { signUpEmail, UserState } from "../lib/user-actions";
 import { useActionState } from "react";
 
 export default function Page() {
-  const initialState: UserState = { message: null, errors: {} };
-  const [state, formAction] = useActionState(createUser, initialState);
+  const initialState = "";
+  const [state, formAction] = useActionState(signUpEmail, initialState);
   return (
     <main>
       <form

@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
-import { authConfig } from "./auth.config";
+import { nextCookies } from "better-auth/next-js";
 import z from "zod";
 import bcrypt from "bcrypt";
-import { getUserByEmail } from "./app/lib/user-actions";
+import { getUserByEmail } from "./user-actions";
 
 const pool = new Pool({
   host: process.env.DATABASE_HOST,
@@ -17,7 +17,8 @@ const pool = new Pool({
 
 export const auth = betterAuth({
   database: pool,
-  emailAndPassword: { 
-      enabled: true, 
-    }, 
-})
+  emailAndPassword: {
+    enabled: true,
+  },
+  plugins: [nextCookies()],
+});
