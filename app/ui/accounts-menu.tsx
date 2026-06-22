@@ -22,8 +22,22 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
+import { useState } from "react";
+import { authClient } from "../lib/auth-client";
+import { redirect } from "next/navigation";
+
+async function signOut() {
+  await authClient.signOut({
+    fetchOptions: {
+      onSuccess: () => {
+        redirect("/login"); // redirect to login page
+      },
+    },
+  });
+}
 
 export default function AccountMenu() {
+  const [open, setOpen] = useState(false);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -50,24 +64,30 @@ export default function AccountMenu() {
               onSelect={(e) => e.preventDefault()}
             >
               <LogOutIcon />
-              Log Out
+              Sign Out
             </DropdownMenuItem>
           </AlertDialogTrigger>
 
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction variant="destructive">
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
+          <AlertDialogContent size="sm">
+            <form
+              onSubmit={(event) => {
+                signOut().then(() => setOpen(false));
+                event.preventDefault();
+              }}
+            >
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sign Out?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to sign out?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" type="submit">
+                  Sign Out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </form>
           </AlertDialogContent>
         </AlertDialog>
       </DropdownMenuContent>
