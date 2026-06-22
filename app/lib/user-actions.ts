@@ -71,6 +71,7 @@ export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
 ) {
+  let isSuccessful = false;
   try {
     await auth.api.signInEmail({
       body: {
@@ -79,9 +80,11 @@ export async function authenticate(
         callbackURL: formData.get("redirectTo")?.toString() || "/home",
       },
     });
+    isSuccessful = true;
   } catch (error) {
     return `Something went wrong: ${error}`;
   }
+  if (isSuccessful) redirect("/home");
 }
 
 export async function signUpEmail(
