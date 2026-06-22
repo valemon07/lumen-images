@@ -1,9 +1,19 @@
-import NextAuth from "next-auth";
-import { authConfig } from "./auth.config";
+import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { auth } from "@/app/lib/auth";
 
-export default NextAuth(authConfig).auth;
+export async function proxy(request: NextRequest) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  // https://nextjs.org/docs/app/api-reference/file-conventions/proxy#matcher
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: ["/home"], // Specify the routes the middleware applies to
 };

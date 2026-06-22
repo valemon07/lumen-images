@@ -2,11 +2,12 @@ import { getImagesPerUser, getTestItems } from "../lib/data";
 
 export default async function Page() {
   const images = await getImagesPerUser({
-    id: 2,
+    id: "test",
     name: "test",
-    email: "test",
-    emailVerified: new Date(8.64e15),
-    image: "why is this text",
+    email: "test@mail.com",
+    password_hash: "23",
+    emailVerified: null,
+    image: null,
   });
   const testItems = await getTestItems();
   return (

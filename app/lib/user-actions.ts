@@ -4,8 +4,7 @@ import z from "zod";
 import sql from "./db";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import { signIn } from "@/auth";
-import { AuthError } from "next-auth";
+import { auth } from "@/app/lib/auth";
 import { User } from "./types";
 
 export type UserState = {
@@ -72,18 +71,40 @@ export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
 ) {
+  let isSuccessful = false;
   try {
-    await signIn("credentials", formData, {
-      redirectTo: formData.get("redirectTo")?.toString() || "/home",
+    await auth.api.signInEmail({
+      body: {
+        email: formData.get("email")?.toString() || "",
+        password: formData.get("password")?.toString() || "",
+        callbackURL: formData.get("redirectTo")?.toString() || "/home",
+      },
     });
+    isSuccessful = true;
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return "Invalid Credentials.";
-        default:
-          return "Something went wrong.";
-      }
-    }
+    return `Something went wrong: ${error}`;
   }
+  if (isSuccessful) redirect("/home");
+}
+
+export async function signUpEmail(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  let isSuccessful = false;
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        name: formData.get("name")?.toString() || "",
+        email: formData.get("email")?.toString() || "",
+        password: formData.get("password")?.toString() || "",
+        callbackURL: formData.get("redirectTo")?.toString() || "/home",
+      },
+      asResponse: true,
+    });
+    isSuccessful = true;
+  } catch (e) {
+    return `Error - Failed to Create User: ${e}`;
+  }
+  if (isSuccessful) redirect("/home");
 }
