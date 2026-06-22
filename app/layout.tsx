@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
-import "@mantine/core/styles.css";
+//import "@mantine/core/styles.css";
 import "./ui/globals.css";
 
-import {
-  ColorSchemeScript,
-  MantineProvider,
-  mantineHtmlProps,
-} from "@mantine/core";
+// import {
+//   ColorSchemeScript,
+//   MantineProvider,
+//   mantineHtmlProps,
+// } from "@mantine/core";
 import { cn } from "@/lib/utils";
 
 import AccountMenu from "./ui/accounts-menu";
 import { ThemeProvider } from "next-themes";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -46,13 +47,16 @@ export default function RootLayout({
         "font-sans",
         inter.variable,
       )}
-      {...mantineHtmlProps}
+      // {...mantineHtmlProps}
     >
-      <head>
-        <ColorSchemeScript />
-      </head>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <head>{/*<ColorSchemeScript />*/}</head>
+      <body className="bg-background text-foreground">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           {/*<MantineProvider>{children}</MantineProvider>*/}
           <AccountMenu />
           {children}
