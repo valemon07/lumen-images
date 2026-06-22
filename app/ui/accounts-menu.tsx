@@ -39,64 +39,60 @@ async function signOut() {
 }
 
 export default function AccountMenu() {
-  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
-
-  if (session) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">{session.user.name}</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <UserIcon />
-              Profile
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline"></Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <UserIcon />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <SettingsIcon />
+            Settings
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={(e) => e.preventDefault()}
+            >
+              <LogOutIcon />
+              Sign Out
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <SettingsIcon />
-              Settings
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <DropdownMenuItem
-                variant="destructive"
-                onSelect={(e) => e.preventDefault()}
-              >
-                <LogOutIcon />
-                Sign Out
-              </DropdownMenuItem>
-            </AlertDialogTrigger>
+          </AlertDialogTrigger>
 
-            <AlertDialogContent size="sm">
-              <form
-                onSubmit={(event) => {
-                  signOut().then(() => setOpen(false));
-                  event.preventDefault();
-                }}
-              >
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Sign Out?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to sign out?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction variant="destructive" type="submit">
-                    Sign Out
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </form>
-            </AlertDialogContent>
-          </AlertDialog>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+          <AlertDialogContent size="sm">
+            <form
+              onSubmit={(event) => {
+                signOut().then(() => setOpen(false));
+                event.preventDefault();
+              }}
+            >
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sign Out?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to sign out?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" type="submit">
+                  Sign Out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </form>
+          </AlertDialogContent>
+        </AlertDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

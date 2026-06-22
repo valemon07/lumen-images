@@ -10,7 +10,6 @@ import "./ui/globals.css";
 // } from "@mantine/core";
 import { cn } from "@/lib/utils";
 
-import AccountMenu from "./ui/accounts-menu";
 import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -58,7 +57,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/*<MantineProvider>{children}</MantineProvider>*/}
-          <AccountMenu />
           {children}
         </ThemeProvider>
       </body>
