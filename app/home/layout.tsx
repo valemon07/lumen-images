@@ -1,10 +1,16 @@
 import AccountMenu from "../ui/accounts-menu";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  <body>
+export default function HomeLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
     <div>
-      <AccountMenu />
+      <div>
+        <AccountMenu />
+      </div>
+      <div>{children}</div>
     </div>
-    <div>{children}</div>
-  </body>;
+  );
 }
