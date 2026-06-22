@@ -1,7 +1,14 @@
 import { getImagesPerUser, getTestItems } from "../lib/data";
 
 export default async function Page() {
-  const images = await getImagesPerUser({ null });
+  const images = await getImagesPerUser({
+    id: "test",
+    name: "test",
+    email: "test@mail.com",
+    password_hash: "23",
+    emailVerified: null,
+    image: null,
+  });
   const testItems = await getTestItems();
   return (
     <main className="flex flex-col justify-center items-center h-screen w-screen">
