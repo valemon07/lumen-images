@@ -88,6 +88,7 @@ export async function signUpEmail(
   prevState: string | undefined,
   formData: FormData,
 ) {
+  let isSuccessful = false;
   try {
     await auth.api.signUpEmail({
       body: {
@@ -98,8 +99,9 @@ export async function signUpEmail(
       },
       asResponse: true,
     });
+    isSuccessful = true;
   } catch (e) {
     return `Error - Failed to Create User: ${e}`;
   }
-  redirect("/home");
+  if (isSuccessful) redirect("/home");
 }
