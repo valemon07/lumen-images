@@ -10,6 +10,9 @@ import {
 } from "@mantine/core";
 import { cn } from "@/lib/utils";
 
+import AccountMenu from "./ui/accounts-menu";
+import { ThemeProvider } from "next-themes";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
@@ -49,7 +52,11 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/*<MantineProvider>{children}</MantineProvider>*/}
+          <AccountMenu />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
