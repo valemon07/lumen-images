@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 import { auth } from "@/app/lib/auth";
 import { User } from "./types";
+import { headers } from "next/headers";
 
 export type UserState = {
   errors?: {
@@ -107,4 +108,16 @@ export async function signUpEmail(
     return `Error - Failed to Create User: ${e}`;
   }
   if (isSuccessful) redirect("/home");
+}
+
+export async function getServerSession() {
+  return await auth.api.getSession({
+    headers: await headers(),
+  });
+}
+
+export async function getCachedUser() {
+  "use cache";
+  const session = await auth.api.getSession({ headers: await headers() });
+  return session?.user;
 }
