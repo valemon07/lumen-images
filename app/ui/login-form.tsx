@@ -6,7 +6,6 @@ import {
   ArrowRightIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "./button";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { authenticate } from "../lib/user-actions";
@@ -19,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -32,19 +32,21 @@ export default function LoginForm() {
   );
 
   return (
-    <Card className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]">
-      <CardHeader>
-        <CardTitle>Log In</CardTitle>
-        <CardDescription>Enter email and password to log in.</CardDescription>
-        <CardAction>
-          <Link href="/signup" className="hover:underline">
-            {" "}
-            Sign up
-          </Link>
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <form action={formAction}>
+    <form
+      action={formAction}
+      className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>Log In</CardTitle>
+          <CardDescription>Enter email and password to log in.</CardDescription>
+          <CardAction>
+            <Link href="/signup" className="hover:underline">
+              Sign up
+            </Link>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -75,8 +77,13 @@ export default function LoginForm() {
               />
             </div>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+        <CardFooter className="flex-col gap-2">
+          <Button type="submit" className="w-full">
+            Login
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
   );
 }
