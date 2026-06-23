@@ -1,6 +1,7 @@
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { S3Client } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import { sendImageToDatabase } from "@/app/lib/actions";
 
 export async function POST(request: Request) {
   const { filename, contentType } = await request.json();
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
       },
       Expires: 600, // Seconds before the presigned post expires. 3600 by default.
     });
-    console.log(url);
+    await sendImageToDatabase(filename, s3Key);
 
     return Response.json({ url, fields });
   } catch (error) {
