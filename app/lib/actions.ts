@@ -1,4 +1,8 @@
+"use server";
 import { User } from "./types";
+import sql from "./db";
+import { auth } from "./auth";
+import { headers } from "next/headers";
 
 export const uploadImage = async (file: File) => {
   if (!file) {
@@ -41,3 +45,19 @@ export const uploadImage = async (file: File) => {
     alert("Failed to get pre-signed URL.");
   }
 };
+
+export async function sendImageToDatabase(fileName: string, key: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (session) {
+    const userId = session?.user.id;
+    const fileUrl = `https://${process.env.BUCKET_NAME}://${key}`;
+    try {
+      await sql`
+        INSERT INTO images(file_name, s3_url, user_id)
+        VALUES (${fileName}, ${fileUrl}, ${userId})
+        `;
+    } catch (e) {
+      return `Error uploading to database: ${e}`;
+    }
+  }
+}

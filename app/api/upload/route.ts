@@ -17,9 +17,10 @@ export async function POST(request: Request) {
     }
 
     const client = new S3Client({ region });
+    const s3Key = uuidv4();
     const { url, fields } = await createPresignedPost(client, {
       Bucket: bucket,
-      Key: uuidv4(),
+      Key: s3Key,
       Conditions: [
         ["content-length-range", 0, 10485760], // up to 10 MB
         ["starts-with", "$Content-Type", contentType],
