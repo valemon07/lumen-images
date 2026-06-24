@@ -1,4 +1,4 @@
-import { getImagesPerUserId, getTestItems } from "../lib/data";
+import { getImagesPerUserId } from "../lib/data";
 import {
   Card,
   CardAction,
@@ -11,13 +11,20 @@ import {
 
 import { auth } from "../lib/auth";
 import { headers } from "next/headers";
+import Image from "next/image";
+import { getPresignedImage } from "../lib/actions";
 
 export default async function TestCard() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (session) {
     const userId = session?.user.id;
     const images = await getImagesPerUserId(userId);
-    const testItems = await getTestItems();
+    const imageUrls = await Promise.all(
+      images.map((image) => {
+        const key = image.s3_url.substring(image.s3_url.lastIndexOf("/") + 1);
+        return getPresignedImage(key);
+      }),
+    );
     return (
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
@@ -29,10 +36,17 @@ export default async function TestCard() {
           <div>
             <p>Images:</p>
             <div className="flex flex-row">
-              {images.map((image) => {
-                return <div key={image.id}>
-                  {image.s3_url}
-                </div>;
+              {images.map((image, i) => {
+                return (
+                  <div key={image.id}>
+                    <Image
+                      src={imageUrls[i]}
+                      alt="image"
+                      width={500}
+                      height={500}
+                    />
+                  </div>
+                );
               })}
             </div>
           </div>
