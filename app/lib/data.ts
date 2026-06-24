@@ -3,9 +3,11 @@
 import { User, Image, TestType } from "@/app/lib/types";
 import sql from "./db";
 
-export async function getImagesPerUser(user: User) {
+export async function getImagesPerUserId(userId: string) {
   try {
-    const data = await sql<Image[]>`SELECT * FROM images`;
+    const data = await sql<
+      Image[]
+    >`SELECT * FROM images WHERE user_id = ${userId}`;
     const images = data.map((image) => ({
       ...image,
     }));
