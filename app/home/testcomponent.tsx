@@ -1,4 +1,3 @@
-import { getImagesPerUserId } from "../lib/data";
 import {
   Card,
   CardAction,
@@ -9,22 +8,36 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { auth } from "../lib/auth";
-import { headers } from "next/headers";
 import Image from "next/image";
-import { getPresignedImage } from "../lib/actions";
+import { getAllPresignedImages } from "../lib/actions";
 
-export default async function TestCard() {
-  const session = await auth.api.getSession({ headers: await headers() });
+export default async function TestCard(
+  session: {
+    // Maybe make this nicer?
+    session: {
+      id: string;
+      createdAt: Date;
+      updatedAt: Date;
+      userId: string;
+      expiresAt: Date;
+      token: string;
+      ipAddress?: string | null | undefined | undefined;
+      userAgent?: string | null | undefined | undefined;
+    };
+    user: {
+      id: string;
+      createdAt: Date;
+      updatedAt: Date;
+      email: string;
+      emailVerified: boolean;
+      name: string;
+      image?: string | null | undefined | undefined;
+    };
+  } | null,
+) {
   if (session) {
-    const userId = session?.user.id;
-    const images = await getImagesPerUserId(userId);
-    const imageUrls = await Promise.all(
-      images.map((image) => {
-        const key = image.s3_url.substring(image.s3_url.lastIndexOf("/") + 1);
-        return getPresignedImage(key);
-      }),
-    );
+    const userId = session.session.user.id;
+    const images = await getAllPresignedImages(userId);
     return (
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
@@ -36,11 +49,11 @@ export default async function TestCard() {
           <div>
             <p>Images:</p>
             <div className="flex flex-row">
-              {images.map((image, i) => {
+              {images.images.map((image, i) => {
                 return (
                   <div key={image.id}>
                     <Image
-                      src={imageUrls[i]}
+                      src={images.urls[i]}
                       alt="image"
                       width={500}
                       height={500}
