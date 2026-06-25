@@ -46,87 +46,23 @@ const uploadImage = async (file: File) => {
   }
 };
 
-export function MyDropzone(props: { name?: string; required?: boolean }) {
-  const { required, name } = props;
-  const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<File[]>([]);
-
-  async function uploadFiles(files: File[]) {
-    await Promise.all(
-      files.map((file) => {
-        uploadImage(file);
-      }),
-    );
-  }
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+export default function MyDropzone(props) {
+  const {files, setFiles} = props
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(
-      acceptedFiles.map((file) =>
-        Object.assign(file, {
-          preview: URL.createObjectURL(file),
-        }),
-      ),
-    );
-    await uploadFiles(acceptedFiles);
-  }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (incomingFiles) => {
-      if (hiddenInputRef.current) {
-        const dataTransfer = new DataTransfer();
-        incomingFiles.forEach((v) => {
-          dataTransfer.items.add(v);
-        });
-        hiddenInputRef.current.files = dataTransfer.files;
-      }
-    },
-  });
-
-  const thumbs = files.map((file) => (
-    <div key={file.name}>
-      <div>
-        <Image
-          src={file.preview}
-          // Revoke data uri after image is loaded
-          onLoad={() => {
-            URL.revokeObjectURL(file.preview);
-          }}
-          alt="Uploaded file thumbnail"
-        />
-      </div>
-    </div>
-  ));
-
-  return (
-    <div {...getRootProps()}>
-      <input
-        type="file"
-        name={name}
-        required={required}
-        style={{ opacity: 0 }}
-        ref={hiddenInputRef}
-      />
-      <input {...getInputProps()} />
-      {isDragActive ? (
-        <p>Drop the files here ...</p>
-      ) : (
-        <p>Drag and drop some files here, or click to select files</p>
-      )}
-    </div>
+    acceptedFiles.map((file) =>
+      Object.assign(file, {
+        preview: URL.createObjectURL(file),
+      }),
+    ),
   );
-}
-
-export default function UploadZone() {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const file = formData.get("my-file");
-        alert(file.name);
-      }}
-    >
-      <MyDropzone name="my-file" required />
-      <Button type="submit">Submit</Button>
-    </form>
-  );
+  }, [setFiles])
+    const {acceptedFiles, getRootProps, getInputProps} = useDropzone({onDrop});
+  
+  
+  return (<div {...getRootProps({className: 'dropzone'})}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+        <p>{files.length} files selected</p>
+      </div>)
 }

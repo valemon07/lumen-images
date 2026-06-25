@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Dropzone from "react-dropzone";
-import UploadZone from "./dropzone";
+import MyDropzone from "./dropzone";
 
 const uploadImage = async (file: File) => {
   if (!file) {
@@ -57,6 +56,7 @@ const uploadImage = async (file: File) => {
 
 export default function UploadForm() {
   const fileInput = useRef<HTMLInputElement>(null);
+  const [files, setFiles] = useState<File[]>([]);
 
   async function uploadFile(
     evt: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -69,6 +69,14 @@ export default function UploadForm() {
       return "Error!";
     }
     await uploadImage(file);
+  }
+
+  async function handleUpload() {
+    if (files.length === 0) return
+    await Promise.all(files.map((file) => {
+      uploadImage(file);
+    }))
+    setFiles([]);
   }
 
   return (
@@ -84,7 +92,8 @@ export default function UploadForm() {
             Submit
           </Button>
         </form>*/}
-        <UploadZone></UploadZone>
+        <MyDropzone files={files} setFiles={setFiles} />
+                <Button onClick={handleUpload}>Upload Images</Button>
       </CardContent>
     </Card>
   );
