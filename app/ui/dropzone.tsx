@@ -1,4 +1,6 @@
 "use client";
+import { Card, CardContent } from "@/components/ui/card";
+import { UploadIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
@@ -38,11 +40,18 @@ export default function MyDropzone(props: {
   });
 
   return (
-    <div {...getRootProps({ className: "dropzone" })}>
-      <input {...getInputProps()} />
-      <p>Drag and drop some files here, or click to select files</p>
-      <p>{files.length} files selected</p>
-      {thumbs}
+    <div>
+      <div {...getRootProps({ className: "dropzone" })}>
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col justify-center items-center">
+            <input {...getInputProps()} />
+            <UploadIcon />
+            <p>Drag and drop some files here, or click to select files</p>
+          </CardContent>
+        </Card>
+      </div>
+      <p>{files.length} file(s) selected</p>
+      <div className="flex flex-row">{thumbs}</div>
     </div>
   );
 }
