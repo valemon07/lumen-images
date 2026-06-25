@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Dropzone from "react-dropzone";
+import { MyDropzone } from "./dropzone";
 
 const uploadImage = async (file: File) => {
   if (!file) {
@@ -76,12 +78,13 @@ export default function UploadForm() {
         <CardDescription>Max size: 10MB</CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="flex flex-col gap-4">
+        {/*<form className="flex flex-col gap-4">
           <input type="file" name="file" ref={fileInput} />
           <Button type="submit" onClick={uploadFile}>
             Submit
           </Button>
-        </form>
+        </form>*/}
+        <MyDropzone></MyDropzone>
       </CardContent>
     </Card>
   );
