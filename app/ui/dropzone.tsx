@@ -46,7 +46,7 @@ const uploadImage = async (file: File) => {
   }
 };
 
-export default function MyDropzone(props) {
+export default function MyDropzone(props: {files: File[], setFiles: React.Dispatch<React.SetStateAction<File[]>>}) {
   const {files, setFiles} = props
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(
@@ -59,10 +59,14 @@ export default function MyDropzone(props) {
   }, [setFiles])
     const {acceptedFiles, getRootProps, getInputProps} = useDropzone({onDrop});
   
+    const thumbs = files.map((file) => {
+      return <Image key={file.name} src={file.preview} alt="Uploaded image preview" onLoad={() => URL.revokeObjectURL(file.preview)} width={50} height={50}/>
+    })
   
   return (<div {...getRootProps({className: 'dropzone'})}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
         <p>{files.length} files selected</p>
+        {thumbs}
       </div>)
 }
