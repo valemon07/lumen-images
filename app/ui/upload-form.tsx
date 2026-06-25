@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Dropzone from "react-dropzone";
-import { MyDropzone } from "./dropzone";
+import UploadZone from "./dropzone";
 
 const uploadImage = async (file: File) => {
   if (!file) {
@@ -84,7 +84,7 @@ export default function UploadForm() {
             Submit
           </Button>
         </form>*/}
-        <MyDropzone></MyDropzone>
+        <UploadZone></UploadZone>
       </CardContent>
     </Card>
   );
