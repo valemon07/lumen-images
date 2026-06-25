@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -55,27 +55,15 @@ const uploadImage = async (file: File) => {
 };
 
 export default function UploadForm() {
-  const fileInput = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 
-  async function uploadFile(
-    evt: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) {
-    evt.preventDefault();
-
-    const file = fileInput?.current?.files?.[0];
-    if (!file) {
-      console.log("err");
-      return "Error!";
-    }
-    await uploadImage(file);
-  }
-
   async function handleUpload() {
-    if (files.length === 0) return
-    await Promise.all(files.map((file) => {
-      uploadImage(file);
-    }))
+    if (files.length === 0) return;
+    await Promise.all(
+      files.map((file) => {
+        uploadImage(file);
+      }),
+    );
     setFiles([]);
   }
 
@@ -86,14 +74,8 @@ export default function UploadForm() {
         <CardDescription>Max size: 10MB</CardDescription>
       </CardHeader>
       <CardContent>
-        {/*<form className="flex flex-col gap-4">
-          <input type="file" name="file" ref={fileInput} />
-          <Button type="submit" onClick={uploadFile}>
-            Submit
-          </Button>
-        </form>*/}
         <MyDropzone files={files} setFiles={setFiles} />
-                <Button onClick={handleUpload}>Upload Images</Button>
+        <Button onClick={handleUpload}>Upload Images</Button>
       </CardContent>
     </Card>
   );
