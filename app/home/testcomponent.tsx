@@ -10,33 +10,18 @@ import {
 
 import Image from "next/image";
 import { getAllPresignedImages } from "../lib/actions";
+import { auth } from "../lib/auth";
+import { headers } from "next/headers";
 
-export default async function TestCard(
-  session: {
-    // Maybe make this nicer?
-    session: {
-      id: string;
-      createdAt: Date;
-      updatedAt: Date;
-      userId: string;
-      expiresAt: Date;
-      token: string;
-      ipAddress?: string | null | undefined | undefined;
-      userAgent?: string | null | undefined | undefined;
-    };
-    user: {
-      id: string;
-      createdAt: Date;
-      updatedAt: Date;
-      email: string;
-      emailVerified: boolean;
-      name: string;
-      image?: string | null | undefined | undefined;
-    };
-  } | null,
-) {
+export default async function TestCard() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session) {
+    return <div>You must be logged in to access this page.</div>;
+  }
   if (session) {
-    const userId = session.session.user.id;
+    const userId = session.user.id;
     const images = await getAllPresignedImages(userId);
     return (
       <Card className="mx-auto w-full max-w-sm">
