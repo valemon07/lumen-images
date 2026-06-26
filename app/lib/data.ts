@@ -1,13 +1,13 @@
 "use server";
 
-import { Image, TestType } from "@/app/lib/types";
+import { ImageType, TestType } from "@/app/lib/types";
 import sql from "./db";
 
 //TODO: return array?
 export async function getImagesPerUserId(userId: string) {
   try {
     const data = await sql<
-      Image[]
+      ImageType[]
     >`SELECT * FROM images WHERE user_id = ${userId}`;
     const images = data.map((image) => ({
       ...image,

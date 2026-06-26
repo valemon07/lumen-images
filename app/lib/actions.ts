@@ -33,7 +33,9 @@ async function getPresignedImage(imageKey: string) {
   });
 
   // Generates a URL that expires in 3600 seconds (1 hour)
-  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  const url: string = await getSignedUrl(s3Client, command, {
+    expiresIn: 3600,
+  });
   return url;
 }
 
