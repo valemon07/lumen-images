@@ -71,10 +71,15 @@ export default function ImageGrid() {
     <main className="columns-4">
       <div className="flex flex-row flex-wrap gap-4">
         {images.map((image, i) => (
-          <div key={image.id}>
+          <div
+            key={image.id}
+            onClick={() => {
+              alert("I been clicked!");
+            }}
+          >
             <PhotoCard
               src={urls[i]}
-              alt={image.fileName}
+              alt={image.file_name}
               width={250}
               height={250}
               className="rounded-lg w-full block h-auto object-contain"
