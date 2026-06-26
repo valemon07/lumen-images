@@ -4,6 +4,7 @@ import { getAllPresignedImages } from "@/app/lib/actions";
 import { authClient } from "@/app/lib/auth-client";
 import { ImageType } from "../lib/types";
 import { useState, useEffect } from "react";
+import PhotoCard from "./photo-card";
 
 export default function ImageGrid() {
   const [session, setSession] = useState(null);
@@ -71,9 +72,9 @@ export default function ImageGrid() {
       <div className="flex flex-row flex-wrap gap-4">
         {images.map((image, i) => (
           <div key={image.id}>
-            <Image
+            <PhotoCard
               src={urls[i]}
-              alt="image"
+              alt={image.fileName}
               width={250}
               height={250}
               className="rounded-lg w-full block h-auto object-contain"
