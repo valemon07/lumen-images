@@ -3,6 +3,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import AccountMenu from "./accounts-menu";
 import Link from "next/link";
-import { Home } from "lucide-react";
+import { Album, Home, Image, Upload } from "lucide-react";
 
 export function SidebarNav() {
   return (
@@ -33,8 +34,54 @@ export function SidebarNav() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup />
-        <SidebarGroup />
+        <SidebarGroup>
+          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="default" asChild>
+                <Link href="/home/photos">
+                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
+                    <Image className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span>Photos</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="default" asChild>
+                <Link href="/home/albums">
+                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
+                    <Album className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span>Albums</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Other</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="default" asChild>
+                <Link href="/home/upload">
+                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
+                    <Upload className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span>Upload</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <AccountMenu />
