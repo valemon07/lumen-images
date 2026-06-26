@@ -15,7 +15,7 @@ export default function PhotoCard(props: {
         alt={alt}
         width={width}
         height={height}
-        className={className}
+        className={`rounded-lg w-full block h-auto object-contain hover:saturate-75 hover:brightness-125 transition-all duration-300 ease-in-out ${className}`}
       />
     </div>
   );

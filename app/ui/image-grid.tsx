@@ -82,7 +82,7 @@ export default function ImageGrid() {
               alt={image.file_name}
               width={250}
               height={250}
-              className="rounded-lg w-full block h-auto object-contain"
+              className=""
             />
           </div>
         ))}
