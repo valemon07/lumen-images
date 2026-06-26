@@ -9,10 +9,12 @@ export type User = {
 
 export type ImageType = {
   id: number;
+  fileName: string;
+  s3Url: string;
   userId: number;
-  s3_url: string;
-  location: string;
-  date: Date;
+  fileSize: number;
+  fileType: string;
+  lastModified: Date;
 };
 
 export type TestType = {

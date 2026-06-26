@@ -43,7 +43,8 @@ export async function getAllPresignedImages(userId: string) {
   const images = await getImagesPerUserId(userId);
   const imageUrls = await Promise.all(
     images.map((image) => {
-      const key = image.s3_url.substring(image.s3_url.lastIndexOf("/") + 1);
+      // TODO: Change to not need the substring!
+      const key = image.s3Url.substring(image.s3Url.lastIndexOf("/") + 1);
       return getPresignedImage(key);
     }),
   );
