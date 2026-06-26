@@ -67,8 +67,8 @@ export default function ImageGrid() {
   const { images, urls } = imagesData;
 
   return (
-    <main className="columns-auto">
-      <div className="flex flex-row flex-wrap gap-8">
+    <main className="columns-4">
+      <div className="flex flex-row flex-wrap gap-4">
         {images.map((image, i) => (
           <div key={image.id}>
             <Image
