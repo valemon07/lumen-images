@@ -42,7 +42,7 @@ export default function MyDropzone(props: {
   return (
     <div>
       <div {...getRootProps({ className: "dropzone" })}>
-        <Card className="border-dashed">
+        <Card className="border-dashed cursor-pointer">
           <CardContent className="flex flex-col justify-center items-center">
             <input {...getInputProps()} />
             <UploadIcon />
