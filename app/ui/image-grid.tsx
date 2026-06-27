@@ -1,10 +1,31 @@
 "use client";
-import { getAllPresignedImages } from "@/app/lib/actions";
+import { deleteImage, getAllPresignedImages } from "@/app/lib/actions";
 import { authClient } from "@/app/lib/auth-client";
 import { ImageType } from "../lib/types";
 import { useState, useEffect } from "react";
 import PhotoCard from "./photo-card";
-import PhotoModal from "./photo-modal";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2Icon } from "lucide-react";
 
 export default function ImageGrid() {
   const [session, setSession] = useState(null);
@@ -73,42 +94,74 @@ export default function ImageGrid() {
 
   return (
     <div className="columns-4">
-      {focusedImage && (
-        <div className="fixed inset-y-0 left-0 right-0 md:left-(--sidebar-width) md:w-[calc(100vw-var(--sidebar-width))]">
-          <div
-            className="absolute inset-0 bg-background opacity-60 z-50"
-            onClick={() => setFocusedImage(null)}
-          />
-          <div className="relative flex h-full items-center justify-center px-4">
-            <div className="z-51">
-              <PhotoModal
-                src={focusedImage.url}
-                alt={focusedImage.image.file_name}
-                width={500}
-                height={500}
-                className=""
-              />
-            </div>
-          </div>
-        </div>
-      )}
       <div className="flex flex-row flex-wrap gap-4">
-        {images.map((image, i) => (
-          <div
-            key={image.id}
-            onClick={() => {
-              setFocusedImage({ image: image, url: urls[i] });
-            }}
-          >
-            <PhotoCard
-              src={urls[i]}
-              alt={image.file_name}
-              width={250}
-              height={250}
-              className=""
+        <Dialog>
+          {images.map((image, i) => (
+            <div
+              key={image.id}
+              onClick={() => {
+                setFocusedImage({ image: image, url: urls[i] });
+              }}
+            >
+              <DialogTrigger>
+                <PhotoCard
+                  src={urls[i]}
+                  alt={image.file_name}
+                  width={250}
+                  height={250}
+                  className=""
+                />
+              </DialogTrigger>
+            </div>
+          ))}
+          <DialogContent className="min-w-fit">
+            <Image
+              src={focusedImage?.url}
+              alt={focusedImage?.image.file_name}
+              width={600}
+              height={600}
+              className="rounded-lg min-w-1/2"
             />
-          </div>
-        ))}
+            <DialogFooter>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant={"destructive"}>Delete</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent size="sm">
+                  <AlertDialogHeader>
+                    <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                      <Trash2Icon />
+                    </AlertDialogMedia>
+                    <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete the image. Double check
+                      you&apos;re deleting the right image!
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel variant={"outline"}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button
+                        variant={"destructive"}
+                        onClick={() => {
+                          deleteImage(
+                            focusedImage?.image.s3_url.substring(
+                              focusedImage.image.s3_url.lastIndexOf("/") + 1,
+                            ),
+                          );
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

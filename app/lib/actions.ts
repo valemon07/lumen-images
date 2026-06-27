@@ -44,10 +44,28 @@ export async function getAllPresignedImages(userId: string) {
   const imageUrls = await Promise.all(
     images.map((image) => {
       // TODO: Change to not need the substring!
-      console.log(image);
       const key = image.s3_url.substring(image.s3_url.lastIndexOf("/") + 1);
       return getPresignedImage(key);
     }),
   );
   return { images: images, urls: imageUrls };
+}
+
+export async function deleteImage(key: string) {
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ key: key }),
+    },
+  );
+  if (response.ok) {
+    
+    return "Delete successful";
+  } else {
+    console.log("Failed to delete image");
+  }
 }
