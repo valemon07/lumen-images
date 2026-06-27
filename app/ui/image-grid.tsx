@@ -146,11 +146,7 @@ export default function ImageGrid() {
                       <Button
                         variant={"destructive"}
                         onClick={() => {
-                          deleteImage(
-                            focusedImage?.image.s3_url.substring(
-                              focusedImage.image.s3_url.lastIndexOf("/") + 1,
-                            ),
-                          );
+                          deleteImage(focusedImage?.image.s3_url);
                         }}
                       >
                         Delete
