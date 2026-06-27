@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import { getAllPresignedImages } from "@/app/lib/actions";
 import { authClient } from "@/app/lib/auth-client";
 import { ImageType } from "../lib/types";
 import { useState, useEffect } from "react";
 import PhotoCard from "./photo-card";
+import PhotoModal from "./photo-modal";
 
 export default function ImageGrid() {
   const [session, setSession] = useState(null);
@@ -14,6 +14,10 @@ export default function ImageGrid() {
   }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | unknown>();
+  const [focusedImage, setFocusedImage] = useState<{
+    image: ImageType;
+    url: string;
+  } | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,13 +72,32 @@ export default function ImageGrid() {
   const { images, urls } = imagesData;
 
   return (
-    <main className="columns-4">
+    <div className="columns-4">
+      {focusedImage && (
+        <div className="fixed inset-y-0 left-0 right-0 md:left-(--sidebar-width) md:w-[calc(100vw-var(--sidebar-width))]">
+          <div
+            className="absolute inset-0 bg-background opacity-60 z-50"
+            onClick={() => setFocusedImage(null)}
+          />
+          <div className="relative flex h-full items-center justify-center px-4">
+            <div className="z-51">
+              <PhotoModal
+                src={focusedImage.url}
+                alt={focusedImage.image.file_name}
+                width={500}
+                height={500}
+                className=""
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex flex-row flex-wrap gap-4">
         {images.map((image, i) => (
           <div
             key={image.id}
             onClick={() => {
-              alert("I been clicked!");
+              setFocusedImage({ image: image, url: urls[i] });
             }}
           >
             <PhotoCard
@@ -87,6 +110,6 @@ export default function ImageGrid() {
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
 }

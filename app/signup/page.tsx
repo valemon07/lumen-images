@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { signUpEmail, UserState } from "../lib/user-actions";
 import { useActionState } from "react";
 
