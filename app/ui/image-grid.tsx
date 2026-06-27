@@ -2,14 +2,14 @@
 import Image from "next/image";
 import { getAllPresignedImages } from "@/app/lib/actions";
 import { authClient } from "@/app/lib/auth-client";
-import { ImageType } from "../lib/types";
+import { Photo } from "../lib/types";
 import { useState, useEffect } from "react";
 import PhotoCard from "./photo-card";
 
 export default function ImageGrid() {
   const [session, setSession] = useState(null);
   const [imagesData, setImagesData] = useState<{
-    images: ImageType[];
+    images: Photo[];
     urls: string[];
   }>();
   const [loading, setLoading] = useState(true);

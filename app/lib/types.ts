@@ -7,7 +7,7 @@ export type User = {
   password_hash: string;
 };
 
-export type ImageType = {
+export type Photo = {
   id: number;
   file_name: string;
   s3_url: string;
