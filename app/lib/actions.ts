@@ -4,11 +4,26 @@ import { auth } from "./auth";
 import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { getImagesPerUserId } from "./data";
+import { Photo } from "./types";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
+
+export async function getImagesPerUserId(userId: string) {
+  try {
+    const data = await sql<
+      Photo[]
+    >`SELECT * FROM images WHERE user_id = ${userId}`;
+    const images = data.map((image) => ({
+      ...image,
+    }));
+    return images;
+  } catch (e) {
+    console.error(e, "SQL Error: ");
+    throw new Error("Failed to fetch images");
+  }
+}
 
 export async function sendImageToDatabase(fileName: string, key: string) {
   const session = await auth.api.getSession({ headers: await headers() });
