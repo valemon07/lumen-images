@@ -67,7 +67,7 @@ export async function getAllPresignedImages(userId: string) {
 }
 
 export async function deleteImage(key: string) {
-  key = key.substring(key.lastIndexOf("/") + 1);
+  const s3Key = key.substring(key.lastIndexOf("/") + 1);
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
     {
@@ -75,20 +75,20 @@ export async function deleteImage(key: string) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ key: key }),
+      body: JSON.stringify({ key: s3Key }),
     },
   );
   if (response.ok) {
     try {
       console.log("deleting!");
       await sql`
-        DELETE FROM images WHERE s3_url='${key}'
+        DELETE FROM images WHERE s3_url=${key}
         `;
       console.log("deleted.");
+      return "Delete successful";
     } catch (error) {
       console.log("SQL failure: ", error);
     }
-    return "Delete successful";
   } else {
     console.log("Failed to delete image");
   }
