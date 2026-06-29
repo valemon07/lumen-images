@@ -25,10 +25,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
-import { usePathname, redirect } from "next/navigation";
 
 export default function ImageGrid() {
-  const pathname = usePathname();
   const [session, setSession] = useState(null);
   const [imagesData, setImagesData] = useState<{
     images: Photo[];
@@ -40,6 +38,7 @@ export default function ImageGrid() {
     image: Photo;
     url: string;
   } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -94,7 +93,7 @@ export default function ImageGrid() {
   return (
     <div className="columns-4">
       <div className="flex flex-row flex-wrap gap-4">
-        <Dialog>
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           {images.map((image, i) => (
             <div
               key={image.id}
@@ -145,7 +144,15 @@ export default function ImageGrid() {
                       <Button
                         variant={"destructive"}
                         onClick={() => {
-                          deleteImage(focusedImage?.image.s3_key);
+                          if (focusedImage) {
+                            deleteImage(focusedImage.image.s3_key);
+                            const imageIndex = images.indexOf(
+                              focusedImage.image,
+                            );
+                            images.splice(imageIndex, 1);
+                          }
+                          setFocusedImage(null);
+                          setModalOpen(false);
                         }}
                       >
                         Delete
