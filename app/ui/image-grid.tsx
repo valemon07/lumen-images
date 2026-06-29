@@ -25,8 +25,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
+import { usePathname, redirect } from "next/navigation";
 
 export default function ImageGrid() {
+  const pathname = usePathname();
   const [session, setSession] = useState(null);
   const [imagesData, setImagesData] = useState<{
     images: Photo[];
@@ -143,7 +145,7 @@ export default function ImageGrid() {
                       <Button
                         variant={"destructive"}
                         onClick={() => {
-                          deleteImage(focusedImage?.image.s3_url);
+                          deleteImage(focusedImage?.image.s3_key);
                         }}
                       >
                         Delete
