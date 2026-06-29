@@ -10,7 +10,7 @@ export type User = {
 export type Photo = {
   id: number;
   file_name: string;
-  s3_url: string;
+  s3_key: string;
   user_id: number;
   file_size: number;
   file_type: string;

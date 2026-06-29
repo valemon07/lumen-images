@@ -25,15 +25,20 @@ export async function getImagesPerUserId(userId: string) {
   }
 }
 
-export async function sendImageToDatabase(fileName: string, key: string) {
+export async function sendImageToDatabase(
+  fileName: string,
+  fileSize: number,
+  fileType: string,
+  lastModified: Date,
+  key: string,
+) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (session) {
     const userId = session?.user.id;
-    const fileUrl = `https://${process.env.AWS_BUCKET_NAME}://${key}`;
     try {
       await sql`
-        INSERT INTO images(file_name, s3_url, user_id)
-        VALUES (${fileName}, ${fileUrl}, ${userId})
+        INSERT INTO images(file_name, user_id, file_size, file_type, last_modified, s3_key)
+        VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key})
         `;
     } catch (e) {
       console.error("Error uploading to db: ", e);
@@ -59,7 +64,7 @@ export async function getAllPresignedImages(userId: string) {
   const imageUrls = await Promise.all(
     images.map((image) => {
       // TODO: Change to not need the substring!
-      const key = image.s3_url.substring(image.s3_url.lastIndexOf("/") + 1);
+      const key = image.s3_key;
       return getPresignedImage(key);
     }),
   );
@@ -67,7 +72,6 @@ export async function getAllPresignedImages(userId: string) {
 }
 
 export async function deleteImage(key: string) {
-  const s3Key = key.substring(key.lastIndexOf("/") + 1);
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
     {
@@ -75,14 +79,14 @@ export async function deleteImage(key: string) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ key: s3Key }),
+      body: JSON.stringify({ key: key }),
     },
   );
   if (response.ok) {
     try {
       console.log("deleting!");
       await sql`
-        DELETE FROM images WHERE s3_url=${key}
+        DELETE FROM images WHERE s3_key=${key}
         `;
       console.log("deleted.");
       return "Delete successful";

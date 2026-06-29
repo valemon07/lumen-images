@@ -25,7 +25,12 @@ const uploadImage = async (file: File) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      body: JSON.stringify({
+        filename: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        lastModified: new Date(file.lastModified),
+      }),
     },
   );
 
