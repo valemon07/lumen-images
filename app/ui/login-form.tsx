@@ -1,11 +1,4 @@
 "use client";
-
-import {
-  AtSymbolIcon,
-  KeyIcon,
-  ArrowRightIcon,
-  ExclamationCircleIcon,
-} from "@heroicons/react/24/outline";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { authenticate } from "../lib/user-actions";

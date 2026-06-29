@@ -8,7 +8,6 @@ import Image from "next/image";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -36,7 +35,7 @@ export default function ImageGrid() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | unknown>();
   const [focusedImage, setFocusedImage] = useState<{
-    image: ImageType;
+    image: Photo;
     url: string;
   } | null>(null);
 
@@ -71,9 +70,7 @@ export default function ImageGrid() {
 
   if (loading) {
     return (
-      <main className="flex flex-col justify-center-items-center h-screen w-screen">
-        {/*<SkeletonCard />*/}
-      </main>
+      <main className="flex flex-col justify-center-items-center h-screen w-screen"></main>
     );
   }
 
