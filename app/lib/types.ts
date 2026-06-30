@@ -16,8 +16,3 @@ export type Photo = {
   file_type: string;
   last_modified: Date;
 };
-
-export type TestType = {
-  id: number;
-  name: string;
-};
