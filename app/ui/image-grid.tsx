@@ -25,6 +25,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function ImageGrid() {
   const [session, setSession] = useState(null);
@@ -120,7 +126,35 @@ export default function ImageGrid() {
               height={600}
               className="rounded-lg min-w-1/2"
             />
-            <DialogFooter>
+            <DialogFooter className="flex flex-col">
+              <Accordion type="single" collapsible>
+                <AccordionItem value="metadata">
+                  <AccordionTrigger>View Metadata...</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        <strong>File Name:</strong>{" "}
+                        {focusedImage?.image.file_name}
+                      </div>
+                      <div>
+                        <strong>File Size:</strong>{" "}
+                        {(focusedImage?.image.file_size / 1000000).toFixed(2)}{" "}
+                        MB
+                      </div>
+                      <div>
+                        <strong>File Type:</strong>{" "}
+                        {focusedImage?.image.file_type}
+                      </div>
+                      <div>
+                        <strong>Last Modified:</strong>{" "}
+                        {new Date(
+                          focusedImage?.image.last_modified || "",
+                        ).toLocaleString()}
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant={"destructive"}>Delete</Button>
