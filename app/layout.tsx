@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
-//import "@mantine/core/styles.css";
 import "./ui/globals.css";
-
-// import {
-//   ColorSchemeScript,
-//   MantineProvider,
-//   mantineHtmlProps,
-// } from "@mantine/core";
 import { cn } from "@/lib/utils";
-
 import { ThemeProvider } from "next-themes";
-
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,9 +37,8 @@ export default function RootLayout({
         "font-sans",
         inter.variable,
       )}
-      // {...mantineHtmlProps}
     >
-      <head>{/*<ColorSchemeScript />*/}</head>
+      <head></head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
@@ -56,7 +46,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/*<MantineProvider>{children}</MantineProvider>*/}
           {children}
         </ThemeProvider>
       </body>
