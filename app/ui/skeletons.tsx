@@ -14,3 +14,7 @@ export function SkeletonCard() {
     </Card>
   );
 }
+
+export function SkeletonImage() {
+  return <Skeleton className="aspect-square mx-auto rounded-xl" />;
+}
