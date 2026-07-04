@@ -10,7 +10,7 @@ const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
 
-export async function getImagesPerUserId(userId: string) {
+export async function getImagesPerUserId(userId: string): Promise<Photo[]> {
   try {
     const data = await sql<
       Photo[]
@@ -60,18 +60,20 @@ async function getPresignedImage(imageKey: string) {
 }
 
 export async function getAllPresignedImages(userId: string) {
+  //await new Promise((resolve) => setTimeout(resolve, 3000)); // REMOVE!
   const images = await getImagesPerUserId(userId);
   const imageUrls = await Promise.all(
-    images.map((image) => {
-      // TODO: Change to not need the substring!
+    images.map(async (image) => {
       const key = image.s3_key;
-      return getPresignedImage(key);
+      const presignedImageUrl = await getPresignedImage(key);
+      return presignedImageUrl;
     }),
   );
-  return { images: images, urls: imageUrls };
+
+  return { photos: images, urls: imageUrls };
 }
 
-export async function deleteImage(key: string) {
+export async function deletePhoto(photo: Photo) {
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
     {
@@ -79,16 +81,17 @@ export async function deleteImage(key: string) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ key: key }),
+      body: JSON.stringify({ key: photo.s3_key }),
     },
   );
   if (response.ok) {
     try {
       console.log("deleting!");
       await sql`
-        DELETE FROM images WHERE s3_key=${key}
+        DELETE FROM images WHERE s3_key=${photo.s3_key}
         `;
       console.log("deleted.");
+
       return "Delete successful";
     } catch (error) {
       console.log("SQL failure: ", error);

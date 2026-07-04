@@ -2,7 +2,6 @@
 
 import z from "zod";
 import sql from "./db";
-import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 import { auth } from "@/app/lib/auth";
 import { User } from "./types";
