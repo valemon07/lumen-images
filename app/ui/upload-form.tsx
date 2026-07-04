@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import MyDropzone from "./dropzone";
 
-const uploadImage = async (file: File) => {
+const uploadPhoto = async (file: File) => {
   if (!file) {
     alert("Please select a file to upload.");
     return;
@@ -66,7 +66,7 @@ export default function UploadForm() {
     if (files.length === 0) return;
     await Promise.all(
       files.map((file) => {
-        uploadImage(file);
+        uploadPhoto(file);
       }),
     );
     setFiles([]);

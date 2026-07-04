@@ -10,22 +10,22 @@ const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
 
-export async function getImagesPerUserId(userId: string): Promise<Photo[]> {
+export async function getPhotosPerUserId(userId: string): Promise<Photo[]> {
   try {
     const data = await sql<
       Photo[]
     >`SELECT * FROM images WHERE user_id = ${userId}`;
-    const images = data.map((image) => ({
-      ...image,
+    const photos = data.map((photo) => ({
+      ...photo,
     }));
-    return images;
+    return photos;
   } catch (e) {
     console.error(e, "SQL Error: ");
     throw new Error("Failed to fetch images");
   }
 }
 
-export async function sendImageToDatabase(
+export async function sendPhotoToDatabase(
   fileName: string,
   fileSize: number,
   fileType: string,
@@ -46,10 +46,10 @@ export async function sendImageToDatabase(
   }
 }
 
-async function getPresignedImage(imageKey: string) {
+async function getPresignedPhotoUrl(photoKey: string) {
   const command = new GetObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME,
-    Key: imageKey, // e.g., "profiles/user-123.jpg"
+    Key: photoKey, // e.g., "profiles/user-123.jpg"
   });
 
   // Generates a URL that expires in 3600 seconds (1 hour)
@@ -59,18 +59,18 @@ async function getPresignedImage(imageKey: string) {
   return url;
 }
 
-export async function getAllPresignedImages(userId: string) {
+export async function getAllPresignedPhotos(userId: string) {
   //await new Promise((resolve) => setTimeout(resolve, 3000)); // REMOVE!
-  const images = await getImagesPerUserId(userId);
-  const imageUrls = await Promise.all(
-    images.map(async (image) => {
-      const key = image.s3_key;
-      const presignedImageUrl = await getPresignedImage(key);
-      return presignedImageUrl;
+  const photos = await getPhotosPerUserId(userId);
+  const photoUrls = await Promise.all(
+    photos.map(async (photo) => {
+      const key = photo.s3_key;
+      const presignedPhotoUrl = await getPresignedPhotoUrl(key);
+      return presignedPhotoUrl;
     }),
   );
 
-  return { photos: images, urls: imageUrls };
+  return { photos: photos, urls: photoUrls };
 }
 
 export async function deletePhoto(photo: Photo) {

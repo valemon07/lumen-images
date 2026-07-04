@@ -1,6 +1,6 @@
 //TODO: move authentication out of component and
 
-import { getAllPresignedImages } from "@/app/lib/actions";
+import { getAllPresignedPhotos } from "@/app/lib/actions";
 import { Photo } from "../lib/types";
 import PhotoCard from "./photo-card";
 import { auth } from "../lib/auth";
@@ -10,7 +10,7 @@ export default async function ImageGrid() {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (session) {
-    const photosData = await getAllPresignedImages(session.user.id);
+    const photosData = await getAllPresignedPhotos(session.user.id);
 
     if (!photosData) return <div>No images found!</div>;
     const { photos, urls } = photosData;
