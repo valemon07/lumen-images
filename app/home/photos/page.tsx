@@ -1,7 +1,7 @@
-import ImageGrid from "@/app/ui/image-grid";
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 import Loading from "../loading";
+import PhotoGridContainer from "@/app/ui/photo-grid-container";
 
 export default function Page() {
   return (
@@ -10,7 +10,7 @@ export default function Page() {
       <Separator />
       <Suspense fallback={<Loading />}>
         <main className="flex flex-col grow justify-center items-center w-auto h-auto m-8">
-          <ImageGrid />
+          <PhotoGridContainer />
         </main>
       </Suspense>
     </div>
