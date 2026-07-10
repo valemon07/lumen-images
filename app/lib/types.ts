@@ -17,6 +17,11 @@ export type Photo = {
   photo_id: string;
 };
 
+export type Album = {
+  album_id: string;
+  album_name: string;
+};
+
 export type UserSession = {
   session: {
     id: string;
