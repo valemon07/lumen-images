@@ -2,6 +2,7 @@ import ImageGrid from "@/app/ui/image-grid";
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 import Loading from "../loading";
+import ImageUploadButton from "@/app/ui/image-upload-button";
 
 export default function Page() {
   return (
@@ -11,6 +12,9 @@ export default function Page() {
       <Suspense fallback={<Loading />}>
         <main className="flex flex-col grow justify-center items-center w-auto h-auto m-8">
           <ImageGrid />
+          <div className="fixed bottom-8 right-8">
+            <ImageUploadButton />
+          </div>
         </main>
       </Suspense>
     </div>

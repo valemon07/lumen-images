@@ -73,15 +73,15 @@ export default function UploadForm() {
   }
 
   return (
-    <Card>
-      <CardHeader className="w-full max-w-sm">
+    <div className="flex flex-col mx-4 my-4 gap-x-4 gap-y-8">
+      <div className="w-full max-w-sm">
         <CardTitle>Upload Files to AWS</CardTitle>
         <CardDescription>Max size: 10MB</CardDescription>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div>
         <MyDropzone files={files} setFiles={setFiles} />
         <Button onClick={handleUpload}>Upload Images</Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
