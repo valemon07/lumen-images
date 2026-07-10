@@ -43,10 +43,10 @@ export default function MyDropzone(props: {
     <div>
       <div {...getRootProps({ className: "dropzone" })}>
         <Card className="cursor-pointer">
-          <CardContent className="flex flex-col justify-center items-center">
+          <CardContent className="flex flex-col justify-center items-center gap-y-4">
             <input {...getInputProps()} />
             <UploadIcon />
-            <p>Drag and drop some files here, or click to select files</p>
+            <p className="text-center">Drag and drop some files here, or click to select files</p>
           </CardContent>
         </Card>
       </div>
