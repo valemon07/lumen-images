@@ -14,7 +14,7 @@ export async function getPhotosPerUserId(userId: string): Promise<Photo[]> {
   try {
     const data = await sql<
       Photo[]
-    >`SELECT * FROM images WHERE user_id = ${userId}`;
+    >`SELECT * FROM photos WHERE user_id = ${userId}`;
     const photos = data.map((photo) => ({
       ...photo,
     }));
@@ -37,7 +37,7 @@ export async function sendPhotoToDatabase(
     const userId = session?.user.id;
     try {
       await sql`
-        INSERT INTO images(file_name, user_id, file_size, file_type, last_modified, s3_key)
+        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key)
         VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key})
         `;
     } catch (e) {
@@ -88,7 +88,7 @@ export async function deletePhoto(photo: Photo) {
     try {
       console.log("deleting!");
       await sql`
-        DELETE FROM images WHERE s3_key=${photo.s3_key}
+        DELETE FROM photos WHERE s3_key=${photo.s3_key}
         `;
       console.log("deleted.");
 

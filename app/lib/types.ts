@@ -8,13 +8,13 @@ export type User = {
 };
 
 export type Photo = {
-  id: number;
   file_name: string;
   s3_key: string;
-  user_id: number;
+  user_id: string;
   file_size: number;
   file_type: string;
   last_modified: Date;
+  photo_id: string;
 };
 
 export type UserSession = {
