@@ -11,7 +11,6 @@ export default function Page() {
       <Separator />
       <Suspense fallback={<Loading />}>
         <main className="flex flex-col grow justify-center items-center w-auto h-auto m-8">
-          <ImageGrid />
           <div className="fixed bottom-8 right-8">
             <ImageUploadButton />
           </div>
