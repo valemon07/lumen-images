@@ -29,14 +29,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { deletePhoto } from "../lib/actions";
 
 export default function PhotoCard(props: {
   photoAndUrl: { photo: Photo; url: string };
+  onDelete: (photo: Photo) => void;
 }) {
-  const { photoAndUrl } = props;
+  const { photoAndUrl, onDelete } = props;
   const { photo, url } = photoAndUrl;
   const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger>
@@ -104,7 +105,7 @@ export default function PhotoCard(props: {
                     variant={"destructive"}
                     onClick={() => {
                       if (photo) {
-                        deletePhoto(photo);
+                        onDelete(photo);
                       }
                       setModalOpen(false);
                     }}

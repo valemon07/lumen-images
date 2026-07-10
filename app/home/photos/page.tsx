@@ -1,8 +1,8 @@
-import ImageGrid from "@/app/ui/image-grid";
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 import Loading from "../loading";
 import ImageUploadButton from "@/app/ui/image-upload-button";
+import PhotoGridContainer from "@/app/ui/photo-grid-container";
 
 export default function Page() {
   return (
@@ -15,6 +15,7 @@ export default function Page() {
           <div className="fixed bottom-8 right-8">
             <ImageUploadButton />
           </div>
+          <PhotoGridContainer />
         </main>
       </Suspense>
     </div>
