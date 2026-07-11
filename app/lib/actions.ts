@@ -4,11 +4,13 @@ import { auth } from "./auth";
 import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Photo } from "./types";
+import { Album, Photo } from "./types";
+import { getServerSession } from "./user-actions";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
+const session = await getServerSession()
 
 export async function getPhotosPerUserId(userId: string): Promise<Photo[]> {
   try {
@@ -32,7 +34,7 @@ export async function sendPhotoToDatabase(
   lastModified: Date,
   key: string,
 ) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  //const session = await auth.api.getSession({ headers: await headers() });
   if (session) {
     const userId = session?.user.id;
     try {
@@ -98,5 +100,19 @@ export async function deletePhoto(photo: Photo) {
     }
   } else {
     console.log("Failed to delete image");
+  }
+}
+
+export async function createAlbum(name: string) {
+  if (name && session) {
+
+    try {
+      const data = await sql<Album[]>`
+      INSERT INTO albums(album_name, user_id) VALUES (${name}, ${session.user.id})
+      `
+      return data.map((album) => ({...album}))
+    } catch (e) {
+      console.log("SQL failure ", e);
+    }
   }
 }
