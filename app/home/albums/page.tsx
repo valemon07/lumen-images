@@ -3,8 +3,13 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "../loading";
+import AlbumUploadChooser from "@/app/ui/album-upload-chooser";
+import { Album } from "@/app/lib/types";
 
 export default async function Page() {
+  const albums: Album[] = [
+    { album_id: "test", album_name: "prueba", user_id: "test" },
+  ];
   return (
     <div className="w-full h-full">
       <div className="text-2xl font-medium my-4 mx-8">Albums</div>
@@ -24,6 +29,7 @@ export default async function Page() {
             </div>
           </div>
         </main>
+        <AlbumUploadChooser albums={albums} />
       </Suspense>
     </div>
   );
