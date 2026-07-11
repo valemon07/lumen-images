@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 import Loading from "../loading";
-import ImageUploadButton from "@/app/ui/image-upload-button";
+import PhotoUploadButton from "@/app/ui/photo-upload-button";
 import PhotoGridContainer from "@/app/ui/photo-grid-container";
 
 export default function Page() {
@@ -12,7 +12,7 @@ export default function Page() {
       <Suspense fallback={<Loading />}>
         <main className="flex flex-col grow justify-center items-center w-auto h-auto m-8">
           <div className="fixed bottom-8 right-8">
-            <ImageUploadButton />
+            <PhotoUploadButton />
           </div>
           <PhotoGridContainer />
         </main>
