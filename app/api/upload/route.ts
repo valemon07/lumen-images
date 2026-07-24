@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { sendPhotoToDatabase } from "@/app/lib/actions";
 
 export async function POST(request: Request) {
-  const { filename, fileSize, fileType, lastModified } = await request.json();
+  const { filename, fileSize, fileType, lastModified, width, height } =
+    await request.json();
 
   try {
     const region = process.env.AWS_REGION;
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
       fileType,
       lastModified,
       s3Key,
+      width,
+      height,
     );
 
     return Response.json({ url, fields });

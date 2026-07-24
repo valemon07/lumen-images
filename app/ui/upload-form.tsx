@@ -12,11 +12,25 @@ import {
 } from "@/components/ui/card";
 import MyDropzone from "./dropzone";
 
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(img.src);
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 const uploadPhoto = async (file: File) => {
   if (!file) {
     alert("Please select a file to upload.");
     return;
   }
+
+  const { width, height } = await getImageDimensions(file);
 
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/upload",
@@ -30,6 +44,8 @@ const uploadPhoto = async (file: File) => {
         fileSize: file.size,
         fileType: file.type,
         lastModified: new Date(file.lastModified),
+        width,
+        height,
       }),
     },
   );
