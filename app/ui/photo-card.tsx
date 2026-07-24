@@ -37,25 +37,35 @@ export default function PhotoCard(props: {
   const { photoAndUrl, onDelete } = props;
   const { photo, url } = photoAndUrl;
   const [modalOpen, setModalOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const imgWidth = photo.width ?? 3;
+  const imgHeight = photo.height ?? 2;
+  const aspectRatio = imgWidth / imgHeight;
 
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-      <DialogTrigger>
-        <Image
-          src={url}
-          alt={photo.file_name}
-          width={250}
-          height={250}
-          className="rounded-lg w-full block h-auto object-contain hover:saturate-75 hover:brightness-125 transition-all duration-300 ease-in-out"
-        />
+      <DialogTrigger asChild>
+        <button className="relative w-full overflow-hidden rounded-lg bg-muted text-left cursor-pointer block">
+          <div style={{ paddingBottom: `${(1 / aspectRatio) * 100}%` }} />
+          <Image
+            src={url}
+            alt={photo.file_name}
+            fill
+            className={`rounded-lg object-cover transition-opacity duration-300 hover:saturate-75 hover:brightness-125 ${loaded ? "opacity-100" : "opacity-0"}`}
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+            loading="lazy"
+            onLoad={() => setLoaded(true)}
+          />
+        </button>
       </DialogTrigger>
       <DialogContent className="min-w-fit">
         <Image
           src={url}
           alt={photo.file_name}
-          width={600}
-          height={600}
-          className="rounded-lg min-w-1/2"
+          width={imgWidth}
+          height={imgHeight}
+          className="rounded-lg min-w-1/2 max-h-[80vh] w-auto h-auto object-contain"
         />
         <DialogFooter className="flex flex-col">
           <Accordion type="single" collapsible>
@@ -72,6 +82,12 @@ export default function PhotoCard(props: {
                   </div>
                   <div>
                     <strong>File Type:</strong> {photo.file_type}
+                  </div>
+                  <div>
+                    <strong>Dimensions:</strong>{" "}
+                    {photo.width && photo.height
+                      ? `${photo.width} x ${photo.height}`
+                      : "Unknown"}
                   </div>
                   <div>
                     <strong>Last Modified:</strong>{" "}

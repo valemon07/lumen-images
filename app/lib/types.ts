@@ -15,6 +15,8 @@ export type Photo = {
   file_type: string;
   last_modified: Date;
   photo_id: string;
+  width?: number;
+  height?: number;
 };
 
 export type Album = {
