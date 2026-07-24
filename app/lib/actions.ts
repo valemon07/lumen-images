@@ -5,12 +5,10 @@ import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Album, Photo } from "./types";
-import { getServerSession } from "./user-actions";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
-const session = await getServerSession()
 
 export async function getPhotosPerUserId(userId: string): Promise<Photo[]> {
   try {
@@ -34,12 +32,14 @@ export async function sendPhotoToDatabase(
   lastModified: Date,
   key: string,
 ) {
-  //const session = await auth.api.getSession({ headers: await headers() });
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (session) {
     const userId = session?.user.id;
     try {
       await sql`
-        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key)
+        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key, width, height)
         VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key})
         `;
     } catch (e) {
@@ -75,6 +75,12 @@ export async function getAllPresignedPhotos(userId: string) {
   return { photos: photos, urls: photoUrls };
 }
 
+export async function getCurrentUserPhotos() {
+  const s = await auth.api.getSession({ headers: await headers() });
+  if (!s) return null;
+  return getAllPresignedPhotos(s.user.id);
+}
+
 export async function deletePhoto(photo: Photo) {
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
@@ -104,13 +110,15 @@ export async function deletePhoto(photo: Photo) {
 }
 
 export async function createAlbum(name: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   if (name && session) {
-
     try {
       const data = await sql<Album[]>`
       INSERT INTO albums(album_name, user_id) VALUES (${name}, ${session.user.id})
-      `
-      return data.map((album) => ({...album}))
+      `;
+      return data.map((album) => ({ ...album }));
     } catch (e) {
       console.log("SQL failure ", e);
     }
