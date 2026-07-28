@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1070.0",
-    "@aws-sdk/s3-presigned-post": "^3.1070.0",
     "@aws-sdk/s3-request-presigner": "^3.1075.0",
     "better-auth": "^1.6.19",
     "class-variance-authority": "^0.7.1",
