@@ -2,13 +2,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import MyDropzone from "./dropzone";
 
@@ -32,46 +27,28 @@ const uploadPhoto = async (file: File) => {
 
   const { width, height } = await getImageDimensions(file);
 
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("filename", file.name);
+  formData.append("fileSize", file.size.toString());
+  formData.append("fileType", file.type);
+  formData.append("lastModified", file.lastModified.toString());
+  formData.append("width", width.toString());
+  formData.append("height", height.toString());
+
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/upload",
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        filename: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        lastModified: new Date(file.lastModified),
-        width,
-        height,
-      }),
+      body: formData,
     },
   );
 
   if (response.ok) {
-    const { url, fields } = await response.json();
-
-    const formData = new FormData();
-    Object.entries(fields).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    formData.append("file", file);
-
-    const uploadResponse = await fetch(url, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (uploadResponse.ok) {
-      alert("Upload successful!");
-    } else {
-      console.error("S3 Upload Error:", uploadResponse);
-      alert("Upload failed.");
-    }
+    alert("Upload successful!");
   } else {
-    alert("Failed to get pre-signed URL.");
+    console.error("Upload Error:", response);
+    alert("Upload failed.");
   }
 };
 

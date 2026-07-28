@@ -1,12 +1,8 @@
-import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { sendPhotoToDatabase } from "@/app/lib/actions";
 
 export async function POST(request: Request) {
-  const { filename, fileSize, fileType, lastModified, width, height } =
-    await request.json();
-
   try {
     const region = process.env.AWS_REGION;
     const bucket = process.env.AWS_BUCKET_NAME;
@@ -18,20 +14,34 @@ export async function POST(request: Request) {
       );
     }
 
-    const client = new S3Client({ region });
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+    if (!file) {
+      return Response.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    const filename = (formData.get("filename") as string) || file.name;
+    const fileType = (formData.get("fileType") as string) || file.type;
+    const fileSize = parseInt(formData.get("fileSize") as string) || file.size;
+    const lastModified = new Date(
+      parseInt(formData.get("lastModified") as string) || file.lastModified,
+    );
+    const width = parseInt(formData.get("width") as string) || undefined;
+    const height = parseInt(formData.get("height") as string) || undefined;
+
     const s3Key = uuidv4();
-    const { url, fields } = await createPresignedPost(client, {
-      Bucket: bucket,
-      Key: s3Key,
-      Conditions: [
-        ["content-length-range", 0, 10485760], // up to 10 MB
-        ["starts-with", "$Content-Type", fileType],
-      ],
-      Fields: {
-        "Content-Type": fileType,
-      },
-      Expires: 600, // Seconds before the presigned post expires. 3600 by default.
-    });
+    const bytes = await file.arrayBuffer();
+
+    const client = new S3Client({ region });
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: s3Key,
+        Body: new Uint8Array(bytes),
+        ContentType: fileType,
+      }),
+    );
+
     await sendPhotoToDatabase(
       filename,
       fileSize,
@@ -42,8 +52,9 @@ export async function POST(request: Request) {
       height,
     );
 
-    return Response.json({ url, fields });
+    return Response.json({ success: true, key: s3Key });
   } catch (error) {
+    console.error("Upload error:", error);
     return Response.json({ error: error });
   }
 }
