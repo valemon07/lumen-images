@@ -28,7 +28,6 @@ export async function POST(request: Request) {
         ["starts-with", "$Content-Type", fileType],
       ],
       Fields: {
-        acl: "public-read",
         "Content-Type": fileType,
       },
       Expires: 600, // Seconds before the presigned post expires. 3600 by default.
