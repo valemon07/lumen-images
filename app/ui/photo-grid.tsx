@@ -57,9 +57,16 @@ export default function PhotoGrid(props: {
   if (photoItems.length === 0) return <div>No images found!</div>;
 
   const visibleItems = photoItems.slice(0, visibleCount);
+  const count = visibleItems.length;
+  const cols =
+    count <= 3
+      ? "columns-1 sm:columns-2 md:columns-3"
+      : count <= 8
+        ? "columns-2 sm:columns-3 md:columns-4"
+        : "columns-2 sm:columns-3 md:columns-4 lg:columns-5";
 
   return (
-    <div className="w-full columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 [&>*]:break-inside-avoid [&>*]:mb-4">
+    <div className={`w-full ${cols} gap-4 [&>*]:break-inside-avoid [&>*]:mb-4`}>
       {visibleItems.map(({ photo, url }) => (
         <PhotoCard
           photoAndUrl={{ photo, url }}
