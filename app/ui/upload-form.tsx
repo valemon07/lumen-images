@@ -45,7 +45,7 @@ const uploadPhoto = async (file: File) => {
   );
 
   if (response.ok) {
-    alert("Upload successful!");
+    window.dispatchEvent(new CustomEvent("photo-uploaded"));
   } else {
     console.error("Upload Error:", response);
     alert("Upload failed.");

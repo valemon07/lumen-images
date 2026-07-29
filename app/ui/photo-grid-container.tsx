@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getCurrentUserPhotos } from "@/app/lib/actions";
 import { Photo } from "../lib/types";
 import PhotoGrid from "./photo-grid";
@@ -12,8 +12,9 @@ export default function PhotoGridContainer() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadPhotos = useCallback(() => {
     let cancelled = false;
+    setLoading(true);
     getCurrentUserPhotos().then((result) => {
       if (cancelled) return;
       setData(result);
@@ -24,9 +25,17 @@ export default function PhotoGridContainer() {
     };
   }, []);
 
+  useEffect(loadPhotos, [loadPhotos]);
+
+  useEffect(() => {
+    const handler = () => loadPhotos();
+    window.addEventListener("photo-uploaded", handler);
+    return () => window.removeEventListener("photo-uploaded", handler);
+  }, [loadPhotos]);
+
   if (loading) {
     return (
-      <div className="w-full columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 [&>*]:break-inside-avoid [&>*]:mb-4">
+      <div className="w-full columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 *:break-inside-avoid *:mb-4">
         {Array.from({ length: 12 }).map((_, i) => (
           <SkeletonImage key={i} />
         ))}
