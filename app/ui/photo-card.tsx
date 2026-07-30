@@ -52,6 +52,7 @@ export default function PhotoCard(props: {
             src={url}
             alt={photo.file_name}
             fill
+            quality={85}
             className={`rounded-lg object-cover transition-opacity duration-300 hover:saturate-75 hover:brightness-125 ${loaded ? "opacity-100" : "opacity-0"}`}
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
             loading="lazy"
@@ -65,6 +66,7 @@ export default function PhotoCard(props: {
           alt={photo.file_name}
           width={imgWidth}
           height={imgHeight}
+          quality={90}
           className="rounded-lg min-w-1/2 max-h-[80vh] w-auto h-auto object-contain"
         />
         <DialogFooter className="flex flex-col">
