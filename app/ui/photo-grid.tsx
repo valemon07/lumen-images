@@ -8,8 +8,6 @@ const SCROLL_BUFFER = 600;
 const INITIAL_LOAD = 30;
 const LOAD_MORE = 20;
 
-type PhotoWithUrl = { photo: Photo; url: string };
-
 export default function PhotoGrid(props: {
   photosData: { photos: Photo[]; urls: string[] };
 }) {
@@ -22,13 +20,13 @@ export default function PhotoGrid(props: {
     [props.photosData.photos, props.photosData.urls],
   );
 
-  const [photoItems, setPhotoItems] = useState<PhotoWithUrl[]>(items);
+  const [deletedKeys, setDeletedKeys] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
 
-  useEffect(() => {
-    setPhotoItems(items);
-    setVisibleCount(INITIAL_LOAD);
-  }, [items]);
+  const photoItems = useMemo(
+    () => items.filter((item) => !deletedKeys.has(item.photo.s3_key)),
+    [items, deletedKeys],
+  );
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +37,9 @@ export default function PhotoGrid(props: {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + LOAD_MORE, photoItems.length));
+          setVisibleCount((prev) =>
+            Math.min(prev + LOAD_MORE, photoItems.length),
+          );
         }
       },
       { rootMargin: `${SCROLL_BUFFER}px` },
@@ -50,7 +50,7 @@ export default function PhotoGrid(props: {
   }, [photoItems.length]);
 
   const handleDelete = useCallback((photo: Photo) => {
-    setPhotoItems((prev) => prev.filter((p) => p.photo.s3_key !== photo.s3_key));
+    setDeletedKeys((prev) => new Set(prev).add(photo.s3_key));
     deletePhoto(photo);
   }, []);
 
@@ -66,7 +66,7 @@ export default function PhotoGrid(props: {
         : "columns-2 sm:columns-3 md:columns-4 lg:columns-5";
 
   return (
-    <div className={`w-full ${cols} gap-4 [&>*]:break-inside-avoid [&>*]:mb-4`}>
+    <div className={`w-full ${cols} gap-4 *:break-inside-avoid *:mb-4`}>
       {visibleItems.map(({ photo, url }) => (
         <PhotoCard
           photoAndUrl={{ photo, url }}
