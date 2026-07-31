@@ -33,6 +33,7 @@ export async function sendPhotoToDatabase(
   key: string,
   width?: number,
   height?: number,
+  albumId?: string,
 ) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -41,8 +42,8 @@ export async function sendPhotoToDatabase(
     const userId = session?.user.id;
     try {
       await sql`
-        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key, width, height)
-        VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key}, ${width ?? null}, ${height ?? null})
+        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key, width, height, album_id)
+        VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key}, ${width ?? null}, ${height ?? null}, ${albumId ?? null})
         `;
     } catch (e) {
       console.error("Error uploading to db: ", e);

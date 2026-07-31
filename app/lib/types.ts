@@ -17,6 +17,7 @@ export type Photo = {
   photo_id: string;
   width?: number;
   height?: number;
+  album_id?: string;
 };
 
 export type Album = {
