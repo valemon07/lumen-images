@@ -62,25 +62,23 @@ export default function PhotoCard(props: {
           />
         </button>
       </DialogTrigger>
-      <DialogContent className="min-w-fit sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div
-          className="relative max-h-[80vh] overflow-hidden rounded-lg bg-muted"
-          style={{ aspectRatio: `${aspectRatio}` }}
-        >
+      <DialogContent className="flex max-h-[90vh] min-w-fit flex-col overflow-y-auto sm:max-w-3xl">
+        <div className="relative mx-auto overflow-hidden rounded-lg bg-muted">
           {!dialogLoaded && (
             <Skeleton className="absolute inset-0 rounded-lg" />
           )}
           <Image
             src={url}
             alt={photo.file_name}
-            fill
+            width={imgWidth}
+            height={imgHeight}
             quality={90}
             sizes="(max-width: 640px) calc(100vw - 3rem), 768px"
-            className={`object-contain transition-opacity duration-300 ${dialogLoaded ? "opacity-100" : "opacity-0"}`}
+            className={`h-auto w-auto max-h-[65vh] max-w-full rounded-lg object-contain transition-opacity duration-300 ${dialogLoaded ? "opacity-100" : "opacity-0"}`}
             onLoad={() => setDialogLoaded(true)}
           />
         </div>
-        <DialogFooter className="flex flex-col">
+        <DialogFooter className="flex shrink-0 flex-col">
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
               <AccordionTrigger>View Metadata...</AccordionTrigger>
