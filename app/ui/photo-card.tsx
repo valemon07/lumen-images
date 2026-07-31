@@ -29,6 +29,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PhotoCard(props: {
   photoAndUrl: { photo: Photo; url: string };
@@ -38,6 +39,7 @@ export default function PhotoCard(props: {
   const { photo, url } = photoAndUrl;
   const [modalOpen, setModalOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [dialogLoaded, setDialogLoaded] = useState(false);
 
   const imgWidth = photo.width ?? 3;
   const imgHeight = photo.height ?? 2;
@@ -60,15 +62,24 @@ export default function PhotoCard(props: {
           />
         </button>
       </DialogTrigger>
-      <DialogContent className="min-w-fit">
-        <Image
-          src={url}
-          alt={photo.file_name}
-          width={imgWidth}
-          height={imgHeight}
-          quality={90}
-          className="rounded-lg min-w-1/2 max-h-[80vh] w-auto h-auto object-contain"
-        />
+      <DialogContent className="min-w-fit sm:max-w-3xl">
+        <div
+          className="relative max-h-[80vh] overflow-hidden rounded-lg bg-muted"
+          style={{ aspectRatio: `${aspectRatio}` }}
+        >
+          {!dialogLoaded && (
+            <Skeleton className="absolute inset-0 rounded-lg" />
+          )}
+          <Image
+            src={url}
+            alt={photo.file_name}
+            fill
+            quality={90}
+            sizes="(max-width: 640px) calc(100vw - 3rem), 768px"
+            className={`object-contain transition-opacity duration-300 ${dialogLoaded ? "opacity-100" : "opacity-0"}`}
+            onLoad={() => setDialogLoaded(true)}
+          />
+        </div>
         <DialogFooter className="flex flex-col">
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
