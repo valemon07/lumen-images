@@ -23,7 +23,7 @@ export default async function Page() {
               {albums.map((album) => (
                 <div key={album.album_id}>
                   <Link href={`/home/albums/${album.album_id}`}>
-                    <Card className="mx-auto max-w-3xs aspect-square flex items-center justify-center text-center p-4">
+                    <Card className="max-w-3xs aspect-square flex items-center justify-center text-center p-4">
                       {album.album_name}
                     </Card>
                   </Link>
