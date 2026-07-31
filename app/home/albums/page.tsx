@@ -3,33 +3,37 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "../loading";
-import AlbumUploadChooser from "@/app/ui/album-upload-chooser";
-import { Album } from "@/app/lib/types";
+import NewAlbumButton from "@/app/ui/new-album-button";
+import { getCurrentUserAlbums } from "@/app/lib/actions";
 
 export default async function Page() {
-  const albums: Album[] = [
-    { album_id: "test", album_name: "prueba", user_id: "test" },
-  ];
+  const albums = await getCurrentUserAlbums();
+
   return (
     <div className="w-full h-full">
-      <div className="text-2xl font-medium my-4 mx-8">Albums</div>
+      <div className="flex items-center justify-between my-4 mx-8">
+        <div className="text-2xl font-medium">Albums</div>
+        <NewAlbumButton />
+      </div>
       <Separator />
       <Suspense fallback={<Loading />}>
         <main className="flex flex-col">
-          <div className="grid grid-cols-5 m-8 gap-3">
-            <div>
-              <Link href="/home/albums/test1">
-                <Card className="mx-auto max-w-3xs aspect-square">Album 1</Card>
-              </Link>
+          {albums && albums.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 m-8 gap-3">
+              {albums.map((album) => (
+                <div key={album.album_id}>
+                  <Link href={`/home/albums/${album.album_id}`}>
+                    <Card className="mx-auto max-w-3xs aspect-square flex items-center justify-center text-center p-4">
+                      {album.album_name}
+                    </Card>
+                  </Link>
+                </div>
+              ))}
             </div>
-            <div>
-              <Link href="/home/albums/test2">
-                <Card className="mx-auto max-w-3xs aspect-square">Album 2</Card>
-              </Link>
-            </div>
-          </div>
+          ) : (
+            <div className="m-8 text-muted-foreground">No albums yet!</div>
+          )}
         </main>
-        <AlbumUploadChooser albumsFromDb={albums} />
       </Suspense>
     </div>
   );
