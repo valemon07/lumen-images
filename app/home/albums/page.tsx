@@ -29,7 +29,7 @@ export default async function Page() {
             </div>
           </div>
         </main>
-        <AlbumUploadChooser albums={albums} />
+        <AlbumUploadChooser albumsFromDb={albums} />
       </Suspense>
     </div>
   );
