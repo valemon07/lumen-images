@@ -64,7 +64,6 @@ async function getPresignedPhotoUrl(photoKey: string) {
 }
 
 export async function getAllPresignedPhotos(userId: string) {
-  //await new Promise((resolve) => setTimeout(resolve, 3000)); // REMOVE!
   const photos = await getPhotosPerUserId(userId);
   const photoUrls = await Promise.all(
     photos.map(async (photo) => {
@@ -124,5 +123,19 @@ export async function createAlbum(name: string) {
     } catch (e) {
       console.log("SQL failure ", e);
     }
+  }
+}
+
+export async function getCurrentUserAlbums() {
+  const s = await auth.api.getSession({ headers: await headers() });
+  if (!s) return null;
+  try {
+    const albums = await sql<
+      Album[]
+    >`SELECT * FROM albums WHERE user_id = ${s.user.id}`;
+    return albums;
+  } catch (e) {
+    console.error(e, "SQL Error");
+    throw new Error("Failed to fetch albums");
   }
 }
