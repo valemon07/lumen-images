@@ -6,7 +6,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Photo } from "../lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { refreshPresignedUrl } from "../lib/actions";
+
+const MAX_RETRIES = 3;
 
 export default function PhotoCard(props: {
   photoAndUrl: { photo: Photo; url: string };
@@ -40,6 +43,34 @@ export default function PhotoCard(props: {
   const [modalOpen, setModalOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [dialogLoaded, setDialogLoaded] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState(url);
+  const [failed, setFailed] = useState(false);
+  const attemptsRef = useRef(0);
+  const retryingRef = useRef(false);
+
+  const handleError = useCallback(async () => {
+    if (retryingRef.current) return;
+    if (attemptsRef.current >= MAX_RETRIES) {
+      setFailed(true);
+      return;
+    }
+    attemptsRef.current += 1;
+    retryingRef.current = true;
+    try {
+      const freshUrl = await refreshPresignedUrl(photo.s3_key);
+      if (!freshUrl) {
+        setFailed(true);
+        return;
+      }
+      setLoaded(false);
+      setDialogLoaded(false);
+      setCurrentUrl(freshUrl);
+    } catch {
+      setFailed(true);
+    } finally {
+      retryingRef.current = false;
+    }
+  }, [photo.s3_key]);
 
   const imgWidth = photo.width ?? 3;
   const imgHeight = photo.height ?? 2;
@@ -50,16 +81,24 @@ export default function PhotoCard(props: {
       <DialogTrigger asChild>
         <button className="relative w-full overflow-hidden rounded-lg bg-muted text-left cursor-pointer block">
           <div style={{ paddingBottom: `${(1 / aspectRatio) * 100}%` }} />
-          <Image
-            src={url}
-            alt={photo.file_name}
-            fill
-            quality={85}
-            className={`rounded-lg object-cover transition-opacity duration-300 hover:saturate-75 hover:brightness-125 ${loaded ? "opacity-100" : "opacity-0"}`}
-            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-            loading="lazy"
-            onLoad={() => setLoaded(true)}
-          />
+          {failed ? (
+            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+              Failed to load
+            </div>
+          ) : (
+            <Image
+              src={currentUrl}
+              key={currentUrl}
+              alt={photo.file_name}
+              fill
+              quality={85}
+              className={`rounded-lg object-cover transition-opacity duration-300 hover:saturate-75 hover:brightness-125 ${loaded ? "opacity-100" : "opacity-0"}`}
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+              loading="lazy"
+              onLoad={() => setLoaded(true)}
+              onError={handleError}
+            />
+          )}
         </button>
       </DialogTrigger>
       <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto">
@@ -67,18 +106,26 @@ export default function PhotoCard(props: {
           className="relative max-h-[80vh] overflow-hidden rounded-lg"
           style={{ aspectRatio: `${aspectRatio}` }}
         >
-          {!dialogLoaded && (
+          {!dialogLoaded && !failed && (
             <Skeleton className="absolute inset-0 rounded-lg" />
           )}
-          <Image
-            src={url}
-            alt={photo.file_name}
-            fill
-            quality={90}
-            sizes="(max-width: 640px) calc(100vw - 3rem), 768px"
-            className={`object-contain transition-opacity duration-300 ${dialogLoaded ? "opacity-100" : "opacity-0"}`}
-            onLoad={() => setDialogLoaded(true)}
-          />
+          {failed ? (
+            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              Failed to load
+            </div>
+          ) : (
+            <Image
+              src={currentUrl}
+              key={currentUrl}
+              alt={photo.file_name}
+              fill
+              quality={90}
+              sizes="(max-width: 640px) calc(100vw - 3rem), 768px"
+              className={`object-contain transition-opacity duration-300 ${dialogLoaded ? "opacity-100" : "opacity-0"}`}
+              onLoad={() => setDialogLoaded(true)}
+              onError={handleError}
+            />
+          )}
         </div>
         <DialogFooter className="flex flex-col">
           <Accordion type="single" collapsible>

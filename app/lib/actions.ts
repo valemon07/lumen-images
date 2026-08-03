@@ -83,6 +83,18 @@ export async function getCurrentUserPhotos() {
   return getAllPresignedPhotos(s.user.id);
 }
 
+export async function refreshPresignedUrl(s3Key: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return null;
+
+  const owned = await sql<Photo[]>`
+    SELECT s3_key FROM photos WHERE s3_key=${s3Key} AND user_id=${session.user.id}
+  `;
+  if (owned.length === 0) return null;
+
+  return getPresignedPhotoUrl(s3Key);
+}
+
 export async function deletePhoto(photo: Photo) {
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
