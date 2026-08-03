@@ -25,12 +25,19 @@ export default function PhotoGridContainer() {
     };
   }, []);
 
-  useEffect(loadPhotos, [loadPhotos]);
-
   useEffect(() => {
+    let cancelled = false;
+    getCurrentUserPhotos().then((result) => {
+      if (cancelled) return;
+      setData(result);
+      setLoading(false);
+    });
     const handler = () => loadPhotos();
     window.addEventListener("photo-uploaded", handler);
-    return () => window.removeEventListener("photo-uploaded", handler);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("photo-uploaded", handler);
+    };
   }, [loadPhotos]);
 
   if (loading) {

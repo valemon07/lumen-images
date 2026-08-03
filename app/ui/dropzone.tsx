@@ -22,7 +22,7 @@ export default function MyDropzone(props: {
     },
     [setFiles],
   );
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
   });
 

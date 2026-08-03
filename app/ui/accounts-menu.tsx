@@ -22,11 +22,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
-import { useState } from "react";
 import { authClient } from "../lib/auth-client";
 import { redirect } from "next/navigation";
-
-const { useSession } = authClient;
 
 async function signOut() {
   await authClient.signOut({
@@ -39,7 +36,6 @@ async function signOut() {
 }
 
 export default function AccountMenu() {
-  const [open, setOpen] = useState(false);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -73,7 +69,7 @@ export default function AccountMenu() {
           <AlertDialogContent size="sm">
             <form
               onSubmit={(event) => {
-                signOut().then(() => setOpen(false));
+                signOut();
                 event.preventDefault();
               }}
             >

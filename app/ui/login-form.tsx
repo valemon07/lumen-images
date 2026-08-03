@@ -1,6 +1,5 @@
 "use client";
 import { useActionState } from "react";
-import { useSearchParams } from "next/navigation";
 import { authenticate } from "../lib/user-actions";
 import {
   Card,
@@ -17,12 +16,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 export default function LoginForm() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/home";
-  const [errorMessage, formAction, isPending] = useActionState(
-    authenticate,
-    undefined,
-  );
+  const [, formAction] = useActionState(authenticate, undefined);
 
   return (
     <form
