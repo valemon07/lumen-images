@@ -26,6 +26,11 @@ export type Album = {
   user_id: string;
 };
 
+export type AlbumWithPreviews = Album & {
+  previews: { photo: Photo; url: string }[];
+  photoCount: number;
+};
+
 export type UserSession = {
   session: {
     id: string;

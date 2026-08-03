@@ -57,10 +57,16 @@ const uploadPhoto = async (file: File, albumId?: string | null) => {
   }
 };
 
-export default function UploadForm() {
+export default function UploadForm({
+  initialAlbumId,
+}: {
+  initialAlbumId?: string;
+}) {
   const [files, setFiles] = useState<File[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
-  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(
+    initialAlbumId ?? null,
+  );
   const [albumsLoading, setAlbumsLoading] = useState(true);
 
   useEffect(() => {

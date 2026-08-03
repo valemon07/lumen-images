@@ -4,7 +4,7 @@ import { auth } from "./auth";
 import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Album, Photo } from "./types";
+import { Album, AlbumWithPreviews, Photo } from "./types";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -151,4 +151,78 @@ export async function getCurrentUserAlbums() {
     console.error(e, "SQL Error");
     throw new Error("Failed to fetch albums");
   }
+}
+
+export async function getCurrentUserAlbumsWithPreviews() {
+  const s = await auth.api.getSession({ headers: await headers() });
+  if (!s) return null;
+  try {
+    const albums = await sql<
+      Album[]
+    >`SELECT * FROM albums WHERE user_id = ${s.user.id}`;
+
+    const photos = await sql<Photo[]>`
+      SELECT * FROM photos
+      WHERE user_id = ${s.user.id} AND album_id IS NOT NULL
+    `;
+
+    const albumsWithPreviews: AlbumWithPreviews[] = albums.map((album) => {
+      const albumPhotos = photos
+        .filter((photo) => photo.album_id === album.album_id)
+        .sort(
+          (a, b) =>
+            new Date(b.last_modified).getTime() -
+            new Date(a.last_modified).getTime(),
+        );
+      return {
+        ...album,
+        previews: albumPhotos.slice(0, 3).map((photo) => ({
+          photo,
+          url: "",
+        })),
+        photoCount: albumPhotos.length,
+      };
+    });
+
+    const previewPhotos = albumsWithPreviews.flatMap((album) =>
+      album.previews.map((preview) => ({
+        albumId: album.album_id,
+        preview,
+      })),
+    );
+    const urls = await Promise.all(
+      previewPhotos.map(({ preview }) =>
+        getPresignedPhotoUrl(preview.photo.s3_key),
+      ),
+    );
+    previewPhotos.forEach(({ preview }, i) => {
+      preview.url = urls[i];
+    });
+
+    return albumsWithPreviews;
+  } catch (e) {
+    console.error(e, "SQL Error");
+    throw new Error("Failed to fetch albums");
+  }
+}
+
+export async function getAlbum(albumId: string) {
+  const s = await auth.api.getSession({ headers: await headers() });
+  if (!s) return null;
+  const albums = await sql<Album[]>`
+    SELECT * FROM albums WHERE album_id = ${albumId} AND user_id = ${s.user.id}
+  `;
+  return albums[0] ?? null;
+}
+
+export async function getAlbumPhotos(albumId: string) {
+  const s = await auth.api.getSession({ headers: await headers() });
+  if (!s) return null;
+  const photos = await sql<Photo[]>`
+    SELECT * FROM photos WHERE album_id = ${albumId} AND user_id = ${s.user.id}
+  `;
+  const urls = await Promise.all(
+    photos.map((photo) => getPresignedPhotoUrl(photo.s3_key)),
+  );
+  return { photos, urls };
 }
