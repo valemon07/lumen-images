@@ -62,9 +62,9 @@ export default function PhotoCard(props: {
           />
         </button>
       </DialogTrigger>
-      <DialogContent className="min-w-fit sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto">
         <div
-          className="relative max-h-[80vh] overflow-hidden rounded-lg bg-muted"
+          className="relative max-h-[80vh] overflow-hidden rounded-lg"
           style={{ aspectRatio: `${aspectRatio}` }}
         >
           {!dialogLoaded && (

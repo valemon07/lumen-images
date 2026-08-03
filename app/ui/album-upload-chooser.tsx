@@ -1,41 +1,205 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Album } from "../lib/types";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { PlusIcon, Check, ChevronDown, FolderIcon } from "lucide-react";
+import { createAlbum } from "../lib/actions";
 
-export default function AlbumUploadChooser(props: { albums: Album[] }) {
-  const { albums } = props;
+export default function AlbumUploadChooser({
+  albums: initialAlbums,
+  selectedAlbumId,
+  onAlbumSelect,
+}: {
+  albums: Album[];
+  selectedAlbumId: string | null;
+  onAlbumSelect: (albumId: string | null) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [albums, setAlbums] = useState(initialAlbums);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newAlbumName, setNewAlbumName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const selectedAlbum = albums.find((a) => a.album_id === selectedAlbumId);
+
+  // Close on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+        setShowCreate(false);
+        setSearch("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Focus search input when opening
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [isOpen]);
+
+  const filteredAlbums = albums.filter((a) =>
+    a.album_name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  async function handleCreateAlbum() {
+    if (!newAlbumName.trim()) return;
+    setIsCreating(true);
+    try {
+      const result = await createAlbum(newAlbumName.trim());
+      if (result) {
+        setAlbums((prev) => [...prev, ...result]);
+        onAlbumSelect(result[0].album_id);
+      }
+      setNewAlbumName("");
+      setShowCreate(false);
+      setSearch("");
+    } catch (e) {
+      console.error("Failed to create album", e);
+    } finally {
+      setIsCreating(false);
+    }
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button>Albums...</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {albums &&
-          albums.map((album, i) => {
-            return (
-              <DropdownMenuCheckboxItem key={i}>
-                {album.album_name}
-              </DropdownMenuCheckboxItem>
-            );
-          })}
-        {!(albums.length == 0) && <DropdownMenuSeparator />}
-        <DropdownMenuItem asChild>
-          <div>
-            <PlusIcon />
-            <p>Create New</p>
-          </div>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="relative" ref={dropdownRef}>
+      <Button
+        variant="outline"
+        className="w-full justify-between"
+        onClick={() => setIsOpen(!isOpen)}
+        type="button"
+      >
+        <span className="flex items-center gap-2 truncate">
+          <FolderIcon className="h-4 w-4 shrink-0" />
+          {selectedAlbum ? selectedAlbum.album_name : "No album selected"}
+        </span>
+        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
+          {!showCreate ? (
+            <>
+              {/* Search */}
+              <div className="p-2">
+                <Input
+                  ref={searchInputRef}
+                  placeholder="Search albums..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-8"
+                />
+              </div>
+
+              {/* Album list */}
+              <div className="max-h-48 overflow-y-auto">
+                {/* "None" option */}
+                <button
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => {
+                    onAlbumSelect(null);
+                    setIsOpen(false);
+                    setSearch("");
+                  }}
+                  type="button"
+                >
+                  <span className="flex-1 text-left text-muted-foreground">None</span>
+                  {selectedAlbumId === null && <Check className="h-4 w-4" />}
+                </button>
+
+                {filteredAlbums.length === 0 ? (
+                  <p className="px-3 py-4 text-center text-sm text-muted-foreground">
+                    No matching albums
+                  </p>
+                ) : (
+                  filteredAlbums.map((album) => (
+                    <button
+                      key={album.album_id}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => {
+                        onAlbumSelect(album.album_id);
+                        setIsOpen(false);
+                        setSearch("");
+                      }}
+                      type="button"
+                    >
+                      <FolderIcon className="h-4 w-4 shrink-0" />
+                      <span className="flex-1 text-left truncate">{album.album_name}</span>
+                      {selectedAlbumId === album.album_id && (
+                        <Check className="h-4 w-4 shrink-0" />
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+
+              {/* Separator */}
+              <div className="border-t" />
+
+              {/* Create new album */}
+              <button
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                onClick={() => {
+                  setShowCreate(true);
+                  setSearch("");
+                }}
+                type="button"
+              >
+                <PlusIcon className="h-4 w-4 shrink-0" />
+                <span>Create new album</span>
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Create album form */}
+              <div className="p-2 flex flex-col gap-2">
+                <Input
+                  placeholder="Album name..."
+                  value={newAlbumName}
+                  onChange={(e) => setNewAlbumName(e.target.value)}
+                  className="h-8"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleCreateAlbum();
+                    if (e.key === "Escape") {
+                      setShowCreate(false);
+                      setNewAlbumName("");
+                    }
+                  }}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleCreateAlbum}
+                    disabled={!newAlbumName.trim() || isCreating}
+                  >
+                    {isCreating ? "Creating..." : "Create"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setShowCreate(false);
+                      setNewAlbumName("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

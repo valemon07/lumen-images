@@ -1,13 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { CardTitle, CardDescription } from "@/components/ui/card";
 import MyDropzone from "./dropzone";
+import AlbumUploadChooser from "./album-upload-chooser";
+import { getCurrentUserAlbums } from "../lib/actions";
+import type { Album } from "../lib/types";
 
-function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+function getImageDimensions(
+  file: File,
+): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -19,7 +21,7 @@ function getImageDimensions(file: File): Promise<{ width: number; height: number
   });
 }
 
-const uploadPhoto = async (file: File) => {
+const uploadPhoto = async (file: File, albumId?: string | null) => {
   if (!file) {
     alert("Please select a file to upload.");
     return;
@@ -35,6 +37,9 @@ const uploadPhoto = async (file: File) => {
   formData.append("lastModified", file.lastModified.toString());
   formData.append("width", width.toString());
   formData.append("height", height.toString());
+  if (albumId) {
+    formData.append("albumId", albumId);
+  }
 
   const response = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL + "/api/upload",
@@ -54,12 +59,24 @@ const uploadPhoto = async (file: File) => {
 
 export default function UploadForm() {
   const [files, setFiles] = useState<File[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
+  const [albumsLoading, setAlbumsLoading] = useState(true);
+
+  useEffect(() => {
+    getCurrentUserAlbums().then((result) => {
+      if (result) {
+        setAlbums(result);
+      }
+      setAlbumsLoading(false);
+    });
+  }, []);
 
   async function handleUpload() {
     if (files.length === 0) return;
     await Promise.all(
       files.map((file) => {
-        uploadPhoto(file);
+        uploadPhoto(file, selectedAlbumId);
       }),
     );
     setFiles([]);
@@ -71,7 +88,21 @@ export default function UploadForm() {
         <CardTitle>Upload Files to AWS</CardTitle>
         <CardDescription>Max size: 10MB</CardDescription>
       </div>
-      <div>
+      <div className="flex flex-col gap-4">
+        <div className="w-full max-w-sm">
+          <label className="text-sm font-medium mb-1.5 block">
+            Album (optional)
+          </label>
+          {albumsLoading ? (
+            <div className="h-9 rounded-md border bg-muted animate-pulse" />
+          ) : (
+            <AlbumUploadChooser
+              albums={albums}
+              selectedAlbumId={selectedAlbumId}
+              onAlbumSelect={setSelectedAlbumId}
+            />
+          )}
+        </div>
         <MyDropzone files={files} setFiles={setFiles} />
         <Button onClick={handleUpload}>Upload Images</Button>
       </div>
