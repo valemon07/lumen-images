@@ -5,18 +5,21 @@ import Image from "next/image";
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
+export type PreviewFile = File & { preview: string };
+
 export default function MyDropzone(props: {
-  files: File[];
-  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  files: PreviewFile[];
+  setFiles: React.Dispatch<React.SetStateAction<PreviewFile[]>>;
 }) {
   const { files, setFiles } = props;
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          }),
+        acceptedFiles.map(
+          (file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+            }) as PreviewFile,
         ),
       );
     },

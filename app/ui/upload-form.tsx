@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CardTitle, CardDescription } from "@/components/ui/card";
-import MyDropzone from "./dropzone";
+import MyDropzone, { type PreviewFile } from "./dropzone";
 import AlbumUploadChooser from "./album-upload-chooser";
 import { getCurrentUserAlbums } from "../lib/actions";
 import type { Album } from "../lib/types";
@@ -62,7 +62,7 @@ export default function UploadForm({
 }: {
   initialAlbumId?: string;
 }) {
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<PreviewFile[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(
     initialAlbumId ?? null,

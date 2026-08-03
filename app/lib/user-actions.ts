@@ -27,6 +27,27 @@ export async function getUserByEmail(email: string) {
   }
 }
 
+export async function signUpEmail(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  let isSuccessful = false;
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        name: formData.get("name")?.toString() || "",
+        email: formData.get("email")?.toString() || "",
+        password: formData.get("password")?.toString() || "",
+        callbackURL: "/home",
+      },
+    });
+    isSuccessful = true;
+  } catch (error) {
+    return `Something went wrong: ${error}`;
+  }
+  if (isSuccessful) redirect("/home");
+}
+
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
