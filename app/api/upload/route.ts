@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     );
     const width = parseInt(formData.get("width") as string) || undefined;
     const height = parseInt(formData.get("height") as string) || undefined;
-    const albumId = formData.get("albumId") as string || undefined;
+    const albumId = (formData.get("albumId") as string) || undefined;
 
     const s3Key = uuidv4();
     const bytes = await file.arrayBuffer();

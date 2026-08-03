@@ -1,16 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { CardTitle, CardDescription } from "@/components/ui/card";
 import MyDropzone from "./dropzone";
 import AlbumUploadChooser from "./album-upload-chooser";
 import { getCurrentUserAlbums } from "../lib/actions";
 import type { Album } from "../lib/types";
 
-function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+function getImageDimensions(
+  file: File,
+): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -91,7 +90,9 @@ export default function UploadForm() {
       </div>
       <div className="flex flex-col gap-4">
         <div className="w-full max-w-sm">
-          <label className="text-sm font-medium mb-1.5 block">Album (optional)</label>
+          <label className="text-sm font-medium mb-1.5 block">
+            Album (optional)
+          </label>
           {albumsLoading ? (
             <div className="h-9 rounded-md border bg-muted animate-pulse" />
           ) : (
