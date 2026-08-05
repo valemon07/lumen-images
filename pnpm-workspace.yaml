@@ -2,4 +2,7 @@ ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
 onlyBuiltDependencies:
+  - '@firebase/util'
+  - '@google/genai'
   - bcrypt
+  - protobufjs

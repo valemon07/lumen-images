@@ -2,6 +2,38 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { auth } from "@/app/lib/auth";
 import { headers } from "next/headers";
 import sql from "@/app/lib/db";
+import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
+
+const ai = new GoogleGenAI({});
+
+const analysisSchema = z.object({
+  placeholder: z.string(),
+});
+
+const PLACEHOLDER_PROMPT = "Analyze this image and return structured data.";
+
+async function analyzeWithGemini(
+  base64: string,
+  mimeType: string,
+  prompt: string,
+  schema: z.ZodSchema
+) {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [
+      {
+        inlineData: { mimeType, data: base64 },
+        text: prompt,
+      },
+    ],
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: schema,
+    },
+  });
+  return JSON.parse(response.text ?? "{}");
+}
 
 export async function POST(request: Request) {
   try {
@@ -51,7 +83,10 @@ export async function POST(request: Request) {
     const response = await client.send(command);
 
     if (!response.Body) {
-      return Response.json({ error: "Failed to retrieve image from S3" }, { status: 500 });
+      return Response.json(
+        { error: "Failed to retrieve image from S3" },
+        { status: 500 },
+      );
     }
 
     const chunks: Uint8Array[] = [];
@@ -69,7 +104,10 @@ export async function POST(request: Request) {
       ")",
     );
 
-    return Response.json({ success: true });
+    const mimeType = response.ContentType || "image/jpeg";
+    const result = await analyzeWithGemini(base64, mimeType, PLACEHOLDER_PROMPT, analysisSchema);
+
+    return Response.json(result);
   } catch (error) {
     console.error("Analyze error:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
