@@ -17,7 +17,7 @@ async function analyzeWithGemini(
   base64: string,
   mimeType: string,
   prompt: string,
-  schema: z.ZodSchema
+  schema: z.ZodSchema,
 ) {
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
@@ -105,7 +105,12 @@ export async function POST(request: Request) {
     );
 
     const mimeType = response.ContentType || "image/jpeg";
-    const result = await analyzeWithGemini(base64, mimeType, PLACEHOLDER_PROMPT, analysisSchema);
+    const result = await analyzeWithGemini(
+      base64,
+      mimeType,
+      PLACEHOLDER_PROMPT,
+      analysisSchema,
+    );
 
     return Response.json(result);
   } catch (error) {
