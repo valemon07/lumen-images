@@ -10,6 +10,7 @@ import { useCallback, useRef, useState } from "react";
 import { Photo } from "../lib/types";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2Icon } from "lucide-react";
+import { Trash2Icon, SearchIcon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -47,6 +48,24 @@ export default function PhotoCard(props: {
   const [failed, setFailed] = useState(false);
   const attemptsRef = useRef(0);
   const retryingRef = useRef(false);
+
+  const handleAnalyze = async () => {
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoId: photo.photo_id }),
+      });
+      if (res.ok) {
+        toast.success("Image analyzed");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert("Failed to analyze image: " + (err.error || "Unknown error"));
+      }
+    } catch (error) {
+      alert("Failed to analyze image: " + error);
+    }
+  };
 
   const handleError = useCallback(async () => {
     if (retryingRef.current) return;
@@ -157,41 +176,47 @@ export default function PhotoCard(props: {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant={"destructive"}>Delete</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent size="sm">
-              <AlertDialogHeader>
-                <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                  <Trash2Icon />
-                </AlertDialogMedia>
-                <AlertDialogTitle>Delete Image?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete the image. Double check
-                  you&apos;re deleting the right image!
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel variant={"outline"}>
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button
-                    variant={"destructive"}
-                    onClick={() => {
-                      if (photo) {
-                        onDelete(photo);
-                      }
-                      setModalOpen(false);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleAnalyze}>
+              <SearchIcon className="mr-2 h-4 w-4" />
+              Analyze
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant={"destructive"}>Delete</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent size="sm">
+                <AlertDialogHeader>
+                  <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                    <Trash2Icon />
+                  </AlertDialogMedia>
+                  <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete the image. Double check
+                    you&apos;re deleting the right image!
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel variant={"outline"}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction asChild>
+                    <Button
+                      variant={"destructive"}
+                      onClick={() => {
+                        if (photo) {
+                          onDelete(photo);
+                        }
+                        setModalOpen(false);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
