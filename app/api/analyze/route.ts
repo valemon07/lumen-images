@@ -6,6 +6,34 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 const ai = new GoogleGenAI({});
+const s3Client = new S3Client({ region: process.env.AWS_REGION });
+
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 10; // 10 requests per minute per user
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(key);
+
+  if (!record || now > record.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+function getRateLimitKey(sessionUserId: string, ip?: string): string {
+  return `analyze:${sessionUserId}:${ip || "unknown"}`;
+}
 
 const analysisSchema = z.object({
   subjects: z.array(z.string()).max(5),
@@ -90,6 +118,8 @@ async function analyzeWithGemini(
   return JSON.parse(response.text ?? "{}");
 }
 
+const photoIdSchema = z.string().uuid();
+
 export async function POST(request: Request) {
   try {
     const session = await auth.api.getSession({
@@ -100,10 +130,28 @@ export async function POST(request: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const headersList = await headers();
+    const ip =
+      headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      headersList.get("x-real-ip") ||
+      "unknown";
+
+    const rateLimitKey = getRateLimitKey(session.user.id, ip);
+    if (!checkRateLimit(rateLimitKey)) {
+      return Response.json(
+        { error: "Rate limit exceeded. Try again later." },
+        { status: 429 },
+      );
+    }
+
     const { photoId } = await request.json();
 
-    if (!photoId) {
-      return Response.json({ error: "photoId is required" }, { status: 400 });
+    const photoIdResult = photoIdSchema.safeParse(photoId);
+    if (!photoIdResult.success) {
+      return Response.json(
+        { error: "Invalid photoId format" },
+        { status: 400 },
+      );
     }
 
     const photos = await sql<{ s3_key: string }[]>`
@@ -124,18 +172,17 @@ export async function POST(request: Request) {
 
     if (!region || !bucket) {
       return Response.json(
-        { error: "Missing AWS_REGION or AWS_BUCKET_NAME" },
+        { error: "Server configuration error" },
         { status: 500 },
       );
     }
 
-    const client = new S3Client({ region });
     const command = new GetObjectCommand({
       Bucket: bucket,
       Key: s3_key,
     });
 
-    const response = await client.send(command);
+    const response = await s3Client.send(command);
 
     if (!response.Body) {
       return Response.json(
@@ -144,8 +191,23 @@ export async function POST(request: Request) {
       );
     }
 
+    if (response.ContentLength && response.ContentLength > MAX_IMAGE_SIZE) {
+      return Response.json(
+        { error: "Image too large. Maximum size is 10MB." },
+        { status: 413 },
+      );
+    }
+
     const chunks: Uint8Array[] = [];
+    let totalSize = 0;
     for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+      totalSize += chunk.length;
+      if (totalSize > MAX_IMAGE_SIZE) {
+        return Response.json(
+          { error: "Image too large. Maximum size is 10MB." },
+          { status: 413 },
+        );
+      }
       chunks.push(chunk);
     }
     const buffer = Buffer.concat(chunks);
