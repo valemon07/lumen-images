@@ -30,7 +30,10 @@ export default function AlbumUploadChooser({
   // Close on click outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
         setShowCreate(false);
         setSearch("");
@@ -86,7 +89,7 @@ export default function AlbumUploadChooser({
       </Button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
+        <div className="absolute z-50 mt-1 w-full rounded-xl border bg-popover text-popover-foreground shadow-xl p-1">
           {!showCreate ? (
             <>
               {/* Search */}
@@ -112,7 +115,9 @@ export default function AlbumUploadChooser({
                   }}
                   type="button"
                 >
-                  <span className="flex-1 text-left text-muted-foreground">None</span>
+                  <span className="flex-1 text-left text-muted-foreground">
+                    None
+                  </span>
                   {selectedAlbumId === null && <Check className="h-4 w-4" />}
                 </button>
 
@@ -133,7 +138,9 @@ export default function AlbumUploadChooser({
                       type="button"
                     >
                       <FolderIcon className="h-4 w-4 shrink-0" />
-                      <span className="flex-1 text-left truncate">{album.album_name}</span>
+                      <span className="flex-1 text-left truncate">
+                        {album.album_name}
+                      </span>
                       {selectedAlbumId === album.album_id && (
                         <Check className="h-4 w-4 shrink-0" />
                       )}
