@@ -2,10 +2,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 import Footer from "@/app/ui/footer";
+import Image from "next/image";
+import darkLogo from "../public/dark-logo.png";
+import lightLogo from "../public/light-logo.png";
+import transparentLogo from "../public/logo-transparent.png";
+import { Zap } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-20">
+      <Zap size={72}></Zap>
       <header className="w-full max-w-2xl text-center">
         <h1 className="text-5xl font-bold tracking-tight">Lumen</h1>
         <p className="mt-4 text-xl text-muted-foreground">
