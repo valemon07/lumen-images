@@ -8,10 +8,65 @@ import { z } from "zod";
 const ai = new GoogleGenAI({});
 
 const analysisSchema = z.object({
-  placeholder: z.string(),
+  subjects: z.array(z.string()).max(5),
+  setting: z.enum(["indoor", "outdoor", "studio", "unknown"]),
+  timeOfDay: z.enum([
+    "dawn",
+    "morning",
+    "midday",
+    "afternoon",
+    "golden hour",
+    "dusk",
+    "night",
+    "unknown",
+  ]),
+  weather: z.enum(["clear", "overcast", "foggy", "rainy", "snowy", "unknown"]),
+  mood: z.string(),
+  composition: z.array(
+    z.enum([
+      "rule of thirds",
+      "leading lines",
+      "symmetry",
+      "bokeh",
+      "silhouette",
+      "long exposure",
+      "macro",
+      "wide angle",
+      "portrait",
+    ]),
+  ),
+  colorPalette: z.enum([
+    "warm",
+    "cool",
+    "neutral",
+    "high contrast",
+    "monochrome",
+  ]),
 });
 
-const PLACEHOLDER_PROMPT = "Analyze this image and return structured data.";
+const PROMPT = `You are analyzing a photograph for a photography journal app.
+Return a JSON object analyzing the following dimensions:
+
+- subjects: array of the main subjects (e.g. "cat", "skyline", "flower", "person"). 
+  Be specific but not overly granular. Maximum 5 items.
+  
+- setting: one of ["indoor", "outdoor", "studio", "unknown"]
+
+- timeOfDay: one of ["dawn", "morning", "midday", "afternoon", 
+  "golden hour", "dusk", "night", "unknown"]
+  
+- weather: one of ["clear" , "overcast", "foggy", "rainy", 
+  "snowy", "unknown"] — return "unknown" if indoor or not applicable
+  
+- mood: single word describing the emotional tone of the image
+
+- composition: array of applicable techniques from 
+  ["rule of thirds", "leading lines", "symmetry", "bokeh", 
+  "silhouette", "long exposure", "macro", "wide angle", "portrait"]
+  
+- colorPalette: one of ["warm", "cool", "neutral", "high contrast", "monochrome"]
+
+Return ONLY the JSON object. No explanation, no markdown fences.`;
 
 async function analyzeWithGemini(
   base64: string,
@@ -108,7 +163,7 @@ export async function POST(request: Request) {
     const result = await analyzeWithGemini(
       base64,
       mimeType,
-      PLACEHOLDER_PROMPT,
+      PROMPT,
       analysisSchema,
     );
 
