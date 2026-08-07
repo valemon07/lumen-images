@@ -3,12 +3,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PlusIcon } from "lucide-react";
 import UploadForm from "./upload-form";
+import { Button } from "@/components/ui/button";
 
-export default function PhotoUploadButton({
-  albumId,
-}: {
-  albumId?: string;
-}) {
+export default function NewPhotoButton({ albumId }: { albumId?: string }) {
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -20,8 +17,11 @@ export default function PhotoUploadButton({
         setOpen(next);
       }}
     >
-      <DialogTrigger className="bg-primary hover:brightness-85 transition-all duration-200 ease-in-out rounded-full mx-auto w-10 h-10 flex items-center justify-center">
-        <PlusIcon />
+      <DialogTrigger asChild>
+        <Button>
+          <PlusIcon />
+          Upload Photos
+        </Button>
       </DialogTrigger>
       <DialogContent
         showCloseButton={!uploading}

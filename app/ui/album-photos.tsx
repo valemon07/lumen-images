@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Photo } from "../lib/types";
 import PhotoGrid from "./photo-grid";
-import PhotoUploadButton from "./photo-upload-button";
+import PhotoUploadButton from "./new-photo-button";
 
 export default function AlbumPhotos(props: {
   albumId: string;
