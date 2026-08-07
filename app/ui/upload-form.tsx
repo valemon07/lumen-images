@@ -60,8 +60,10 @@ const uploadPhoto = async (
 
 export default function UploadForm({
   initialAlbumId,
+  onUploadingChange,
 }: {
   initialAlbumId?: string;
+  onUploadingChange?: (uploading: boolean) => void;
 }) {
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -89,6 +91,7 @@ export default function UploadForm({
   async function handleUpload() {
     if (files.length === 0 || uploading) return;
     setUploading(true);
+    onUploadingChange?.(true);
     setStatuses(
       Object.fromEntries(
         files.map((file) => [file.preview, "uploading" as const]),
@@ -123,6 +126,7 @@ export default function UploadForm({
       }, 1500);
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
     }
   }
 
