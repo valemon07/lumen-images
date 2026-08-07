@@ -6,8 +6,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { useCallback, useRef, useState } from "react";
-import { Photo } from "../lib/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Photo, Tag } from "../lib/types";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -31,7 +31,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { refreshPresignedUrl } from "../lib/actions";
+import { refreshPresignedUrl, getPhotoTags } from "../lib/actions";
 
 const MAX_RETRIES = 3;
 
@@ -47,6 +47,8 @@ export default function PhotoCard(props: {
   const [currentUrl, setCurrentUrl] = useState(url);
   const [failed, setFailed] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [tagsLoading, setTagsLoading] = useState(false);
   const attemptsRef = useRef(0);
   const retryingRef = useRef(false);
 
@@ -94,6 +96,23 @@ export default function PhotoCard(props: {
       retryingRef.current = false;
     }
   }, [photo.s3_key]);
+
+  useEffect(() => {
+    if (modalOpen && tags.length === 0 && !tagsLoading) {
+      const fetchTags = async () => {
+        setTagsLoading(true);
+        try {
+          const photoTags = await getPhotoTags(photo.photo_id);
+          setTags(photoTags);
+        } catch (error) {
+          console.error("Failed to fetch tags:", error);
+        } finally {
+          setTagsLoading(false);
+        }
+      };
+      fetchTags();
+    }
+  }, [modalOpen, photo.photo_id, tags.length, tagsLoading]);
 
   const imgWidth = photo.width ?? 3;
   const imgHeight = photo.height ?? 2;
@@ -180,6 +199,31 @@ export default function PhotoCard(props: {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+          {tags.length > 0 && (
+            <Accordion type="single" collapsible>
+              <AccordionItem value="tags">
+                <AccordionTrigger>View Tags...</AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex flex-col gap-2">
+                    {Object.entries(
+                      tags.reduce((acc, tag) => {
+                        acc[tag.category] = [
+                          ...(acc[tag.category] || []),
+                          tag.label,
+                        ];
+                        return acc;
+                      }, {} as Record<string, string[]>),
+                    ).map(([category, labels]) => (
+                      <div key={category}>
+                        <strong>{category.charAt(0).toUpperCase() + category.slice(1)}:</strong>{" "}
+                        {labels.join(", ")}
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
           <div className="flex gap-2">
             <Button
               variant="outline"

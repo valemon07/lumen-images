@@ -4,7 +4,7 @@ import { auth } from "./auth";
 import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Album, AlbumWithPreviews, Photo, AnalysisResult } from "./types";
+import { Album, AlbumWithPreviews, Photo, AnalysisResult, Tag } from "./types";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -270,4 +270,14 @@ export async function insertPhotoTags(photoId: string, analysis: AnalysisResult)
       FROM UNNEST(${categories}::text[], ${labels}::text[]) AS c(category, label)
     `;
   });
+}
+
+export async function getPhotoTags(photoId: string): Promise<Tag[]> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) throw new Error("Unauthorized");
+
+  const tags = await sql<Tag[]>`
+    SELECT * FROM tags WHERE photo_id = ${photoId}
+  `;
+  return tags;
 }
