@@ -52,3 +52,21 @@ export type UserSession = {
     image?: string | null | undefined | undefined;
   };
 } | null;
+
+export type Tag = {
+  id: string;
+  photo_id: string;
+  category: string;
+  label: string;
+  created_at: Date;
+};
+
+export type AnalysisResult = {
+  subjects: string[];
+  setting: 'indoor' | 'outdoor' | 'studio' | 'unknown';
+  timeOfDay: 'dawn' | 'morning' | 'midday' | 'afternoon' | 'golden hour' | 'dusk' | 'night' | 'unknown';
+  weather: 'clear' | 'overcast' | 'foggy' | 'rainy' | 'snowy' | 'unknown';
+  mood: string;
+  composition: string[];
+  colorPalette: 'warm' | 'cool' | 'neutral' | 'high contrast' | 'monochrome';
+};

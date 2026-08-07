@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import sql from "@/app/lib/db";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
+import { insertPhotoTags } from "@/app/lib/actions";
 
 const ai = new GoogleGenAI({});
 const s3Client = new S3Client({ region: process.env.AWS_REGION });
@@ -103,16 +104,16 @@ async function analyzeWithGemini(
   schema: z.ZodSchema,
 ) {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.6-flash",
     contents: [
       {
-        inlineData: { mimeType, data: base64 },
-        text: prompt,
+        role: "user",
+        parts: [{ text: prompt }, { inlineData: { mimeType, data: base64 } }],
       },
     ],
     config: {
       responseMimeType: "application/json",
-      responseSchema: schema,
+      responseJsonSchema: z.toJSONSchema(schema),
     },
   });
   return JSON.parse(response.text ?? "{}");
@@ -228,6 +229,8 @@ export async function POST(request: Request) {
       PROMPT,
       analysisSchema,
     );
+
+    await insertPhotoTags(photoId, result);
 
     return Response.json(result);
   } catch (error) {

@@ -4,7 +4,7 @@ import { auth } from "./auth";
 import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Album, AlbumWithPreviews, Photo } from "./types";
+import { Album, AlbumWithPreviews, Photo, AnalysisResult } from "./types";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -225,4 +225,49 @@ export async function getAlbumPhotos(albumId: string) {
     photos.map((photo) => getPresignedPhotoUrl(photo.s3_key)),
   );
   return { photos, urls };
+}
+
+export async function insertPhotoTags(photoId: string, analysis: AnalysisResult) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) throw new Error("Unauthorized");
+
+  const owned = await sql<{ photo_id: string }[]>`
+    SELECT photo_id FROM photos WHERE photo_id = ${photoId} AND user_id = ${session.user.id}
+  `;
+  if (owned.length === 0) throw new Error("Photo not found or unauthorized");
+
+  const categories: string[] = [];
+  const labels: string[] = [];
+
+  analysis.subjects.forEach((s) => {
+    categories.push("subjects");
+    labels.push(s);
+  });
+  analysis.composition.forEach((c) => {
+    categories.push("composition");
+    labels.push(c);
+  });
+
+  categories.push("setting");
+  labels.push(analysis.setting);
+
+  categories.push("timeOfDay");
+  labels.push(analysis.timeOfDay);
+
+  categories.push("weather");
+  labels.push(analysis.weather);
+
+  categories.push("mood");
+  labels.push(analysis.mood);
+
+  categories.push("colorPalette");
+  labels.push(analysis.colorPalette);
+
+  await sql.begin(async (tx) => {
+    await tx`
+      INSERT INTO tags (photo_id, category, label)
+      SELECT ${photoId}, c.category, c.label
+      FROM UNNEST(${categories}::text[], ${labels}::text[]) AS c(category, label)
+    `;
+  });
 }
