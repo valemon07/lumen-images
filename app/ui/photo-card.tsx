@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2Icon, SearchIcon } from "lucide-react";
+import { Trash2Icon, SearchIcon, Loader2Icon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -46,10 +46,12 @@ export default function PhotoCard(props: {
   const [dialogLoaded, setDialogLoaded] = useState(false);
   const [currentUrl, setCurrentUrl] = useState(url);
   const [failed, setFailed] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const attemptsRef = useRef(0);
   const retryingRef = useRef(false);
 
   const handleAnalyze = async () => {
+    setAnalyzing(true);
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -64,6 +66,8 @@ export default function PhotoCard(props: {
       }
     } catch (error) {
       alert("Failed to analyze image: " + error);
+    } finally {
+      setAnalyzing(false);
     }
   };
 
@@ -177,8 +181,16 @@ export default function PhotoCard(props: {
             </AccordionItem>
           </Accordion>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleAnalyze}>
-              <SearchIcon className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              onClick={handleAnalyze}
+              disabled={analyzing}
+            >
+              {analyzing ? (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <SearchIcon className="mr-2 h-4 w-4" />
+              )}
               Analyze
             </Button>
             <AlertDialog>
