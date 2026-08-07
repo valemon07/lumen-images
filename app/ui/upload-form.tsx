@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CardTitle, CardDescription } from "@/components/ui/card";
-import MyDropzone, { type PreviewFile } from "./dropzone";
+import { Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
+import MyDropzone, { type PreviewFile, type UploadStatus } from "./dropzone";
 import AlbumUploadChooser from "./album-upload-chooser";
 import { getCurrentUserAlbums } from "../lib/actions";
 import type { Album } from "../lib/types";
@@ -21,12 +23,10 @@ function getImageDimensions(
   });
 }
 
-const uploadPhoto = async (file: File, albumId?: string | null) => {
-  if (!file) {
-    alert("Please select a file to upload.");
-    return;
-  }
-
+const uploadPhoto = async (
+  file: PreviewFile,
+  albumId?: string | null,
+): Promise<{ ok: boolean }> => {
   const { width, height } = await getImageDimensions(file);
 
   const formData = new FormData();
@@ -51,9 +51,10 @@ const uploadPhoto = async (file: File, albumId?: string | null) => {
 
   if (response.ok) {
     window.dispatchEvent(new CustomEvent("photo-uploaded"));
+    return { ok: true };
   } else {
     console.error("Upload Error:", response);
-    alert("Upload failed.");
+    return { ok: false };
   }
 };
 
@@ -68,6 +69,8 @@ export default function UploadForm({
     initialAlbumId ?? null,
   );
   const [albumsLoading, setAlbumsLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [statuses, setStatuses] = useState<Record<string, UploadStatus>>({});
 
   useEffect(() => {
     getCurrentUserAlbums().then((result) => {
@@ -78,21 +81,56 @@ export default function UploadForm({
     });
   }, []);
 
+  const handleFilesChange = (updater: React.SetStateAction<PreviewFile[]>) => {
+    setStatuses({});
+    setFiles(updater);
+  };
+
   async function handleUpload() {
-    if (files.length === 0) return;
-    await Promise.all(
-      files.map((file) => {
-        uploadPhoto(file, selectedAlbumId);
-      }),
+    if (files.length === 0 || uploading) return;
+    setUploading(true);
+    setStatuses(
+      Object.fromEntries(
+        files.map((file) => [file.preview, "uploading" as const]),
+      ),
     );
-    setFiles([]);
+    try {
+      const results = await Promise.allSettled(
+        files.map((file) => uploadPhoto(file, selectedAlbumId)),
+      );
+      const nextStatuses: Record<string, UploadStatus> = {};
+      results.forEach((result, index) => {
+        nextStatuses[files[index].preview] =
+          result.status === "fulfilled" && result.value.ok
+            ? "success"
+            : "error";
+      });
+      setStatuses(nextStatuses);
+
+      const successCount = Object.values(nextStatuses).filter(
+        (status) => status === "success",
+      ).length;
+      const failureCount = files.length - successCount;
+      if (failureCount === 0) {
+        toast.success(`Uploaded ${successCount} image(s)`);
+      } else {
+        toast.error(`${failureCount} upload(s) failed`);
+      }
+
+      setTimeout(() => {
+        setFiles([]);
+        setStatuses({});
+      }, 1500);
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
     <div className="flex flex-col mx-4 my-4 gap-x-4 gap-y-8">
       <div className="w-full max-w-sm">
-        <CardTitle>Upload Files to AWS</CardTitle>
-        <CardDescription>Max size: 10MB</CardDescription>
+        <CardTitle>Upload Images</CardTitle>
+        <CardDescription>Max size: 20MB</CardDescription>
       </div>
       <div className="flex flex-col gap-4">
         <div className="w-full max-w-sm">
@@ -109,8 +147,15 @@ export default function UploadForm({
             />
           )}
         </div>
-        <MyDropzone files={files} setFiles={setFiles} />
-        <Button onClick={handleUpload}>Upload Images</Button>
+        <MyDropzone
+          files={files}
+          setFiles={handleFilesChange}
+          statuses={statuses}
+        />
+        <Button onClick={handleUpload} disabled={uploading}>
+          {uploading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+          {uploading ? "Uploading..." : "Upload Images"}
+        </Button>
       </div>
     </div>
   );
