@@ -9,7 +9,7 @@ import { insertPhotoTags } from "@/app/lib/actions";
 const ai = new GoogleGenAI({});
 const s3Client = new S3Client({ region: process.env.AWS_REGION });
 
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
