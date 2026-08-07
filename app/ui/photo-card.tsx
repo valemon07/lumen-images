@@ -169,7 +169,7 @@ export default function PhotoCard(props: {
             />
           )}
         </div>
-        <DialogFooter className="flex flex-col">
+        <DialogFooter className="flex flex-col sm:flex-col">
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
               <AccordionTrigger>View Metadata...</AccordionTrigger>
@@ -206,16 +206,22 @@ export default function PhotoCard(props: {
                 <AccordionContent>
                   <div className="flex flex-col gap-2">
                     {Object.entries(
-                      tags.reduce((acc, tag) => {
-                        acc[tag.category] = [
-                          ...(acc[tag.category] || []),
-                          tag.label,
-                        ];
-                        return acc;
-                      }, {} as Record<string, string[]>),
+                      tags.reduce(
+                        (acc, tag) => {
+                          acc[tag.category] = [
+                            ...(acc[tag.category] || []),
+                            tag.label,
+                          ];
+                          return acc;
+                        },
+                        {} as Record<string, string[]>,
+                      ),
                     ).map(([category, labels]) => (
                       <div key={category}>
-                        <strong>{category.charAt(0).toUpperCase() + category.slice(1)}:</strong>{" "}
+                        <strong>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                          :
+                        </strong>{" "}
                         {labels.join(", ")}
                       </div>
                     ))}
@@ -224,7 +230,7 @@ export default function PhotoCard(props: {
               </AccordionItem>
             </Accordion>
           )}
-          <div className="flex gap-2">
+          <div className="flex-col space-x-2">
             <Button
               variant="outline"
               onClick={handleAnalyze}
