@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
-import AlbumPhotos from "@/app/ui/album-photos";
-import { getAlbum, getAlbumPhotos } from "@/app/lib/actions";
+import AlbumPhotosClient from "./album-photos-client";
+import { getAlbum } from "@/app/lib/actions";
+import Loading from "../../loading";
 
 export default async function Page({
   params,
@@ -9,10 +11,7 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  const [album, photosData] = await Promise.all([
-    getAlbum(id),
-    getAlbumPhotos(id),
-  ]);
+  const album = await getAlbum(id);
 
   if (!album) {
     return (
@@ -28,11 +27,9 @@ export default async function Page({
       <div className="font-medium text-2xl mx-8 my-4">{album.album_name}</div>
       <Separator />
       <main className="flex flex-col grow justify-center items-center w-auto h-auto m-8">
-        {photosData ? (
-          <AlbumPhotos albumId={id} photosData={photosData} />
-        ) : (
-          <div>No images found!</div>
-        )}
+        <Suspense fallback={<Loading />}>
+          <AlbumPhotosClient albumId={id} />
+        </Suspense>
       </main>
     </div>
   );

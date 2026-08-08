@@ -70,3 +70,41 @@ export type AnalysisResult = {
   composition: string[];
   colorPalette: 'warm' | 'cool' | 'neutral' | 'high contrast' | 'monochrome';
 };
+
+export type DateFilter =
+  | { type: 'all' }
+  | { type: 'preset'; days: 7 | 30 | 365 }
+  | { type: 'custom'; from: Date; to: Date };
+
+export type TagFilter = Record<string, string[]>;
+
+export type FilterState = {
+  date: DateFilter;
+  tags: TagFilter;
+};
+
+export const FILTER_CATEGORIES = [
+  'setting',
+  'timeOfDay',
+  'weather',
+  'colorPalette',
+  'composition',
+] as const;
+
+export type FilterCategory = (typeof FILTER_CATEGORIES)[number];
+
+export const CATEGORY_LABELS: Record<FilterCategory, string> = {
+  setting: 'Setting',
+  timeOfDay: 'Time of Day',
+  weather: 'Weather',
+  colorPalette: 'Color Palette',
+  composition: 'Composition',
+};
+
+export const CATEGORY_OPTIONS: Record<FilterCategory, string[]> = {
+  setting: ['indoor', 'outdoor', 'studio'],
+  timeOfDay: ['dawn', 'morning', 'midday', 'afternoon', 'golden hour', 'dusk', 'night'],
+  weather: ['clear', 'overcast', 'foggy', 'rainy', 'snowy'],
+  colorPalette: ['warm', 'cool', 'neutral', 'high contrast', 'monochrome'],
+  composition: ['rule of thirds', 'leading lines', 'symmetry', 'framing', 'negative space', 'patterns'],
+};

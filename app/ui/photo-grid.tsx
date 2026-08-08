@@ -1,8 +1,10 @@
 "use client";
 import { useCallback, useRef, useEffect, useState, useMemo } from "react";
-import { Photo } from "../lib/types";
+import { Photo, FilterState } from "../lib/types";
 import PhotoCard from "./photo-card";
 import { deletePhoto } from "../lib/actions";
+import { Button } from "@/components/ui/button";
+import { XIcon } from "lucide-react";
 
 const SCROLL_BUFFER = 600;
 const INITIAL_LOAD = 30;
@@ -10,14 +12,17 @@ const LOAD_MORE = 20;
 
 export default function PhotoGrid(props: {
   photosData: { photos: Photo[]; urls: string[] };
+  onFiltersChange: (filters: FilterState) => void;
+  currentFilters: FilterState;
 }) {
+  const { photosData, onFiltersChange, currentFilters } = props;
   const items = useMemo(
     () =>
-      props.photosData.photos.map((photo, i) => ({
+      photosData.photos.map((photo, i) => ({
         photo,
-        url: props.photosData.urls[i],
+        url: photosData.urls[i],
       })),
-    [props.photosData.photos, props.photosData.urls],
+    [photosData.photos, photosData.urls],
   );
 
   const [deletedKeys, setDeletedKeys] = useState<Set<string>>(new Set());
@@ -54,7 +59,28 @@ export default function PhotoGrid(props: {
     deletePhoto(photo);
   }, []);
 
-  if (photoItems.length === 0) return <div>No images found!</div>;
+  const handleClearFilters = useCallback(() => {
+    onFiltersChange({ date: { type: "all" }, tags: {} });
+  }, [onFiltersChange]);
+
+  if (photoItems.length === 0) {
+    const hasActiveFilters =
+      currentFilters.date.type !== "all" ||
+      Object.values(currentFilters.tags).some((labels) => labels.length > 0);
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center w-full">
+        <p className="text-muted-foreground">
+          {hasActiveFilters ? "No images match your filters" : "No images found!"}
+        </p>
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="mt-2 gap-1">
+            <XIcon className="h-3 w-3" />
+            Clear filters
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   const visibleItems = photoItems.slice(0, visibleCount);
   const count = visibleItems.length;

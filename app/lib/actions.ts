@@ -4,21 +4,72 @@ import { auth } from "./auth";
 import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Album, AlbumWithPreviews, Photo, AnalysisResult, Tag } from "./types";
+import { unstable_noStore } from "next/cache";
+import { Album, AlbumWithPreviews, Photo, AnalysisResult, Tag, FilterState, DateFilter, TagFilter } from "./types";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
 
-export async function getPhotosPerUserId(userId: string): Promise<Photo[]> {
+function buildDateCondition(dateFilter: DateFilter | undefined): { from: Date | null; to: Date | null } {
+  if (!dateFilter || dateFilter.type === 'all') {
+    return { from: null, to: null };
+  }
+  const now = new Date();
+  if (dateFilter.type === 'preset') {
+    const daysAgo = new Date(now);
+    daysAgo.setDate(now.getDate() - dateFilter.days);
+    return { from: daysAgo, to: now };
+  }
+  return { from: dateFilter.from, to: dateFilter.to };
+}
+
+function buildTagConditions(tagFilter: TagFilter | undefined): { categories: string[]; labels: string[] } | null {
+  if (!tagFilter || Object.keys(tagFilter).length === 0) {
+    return null;
+  }
+  const categories: string[] = [];
+  const labels: string[] = [];
+  const excludedCategories = ['subjects', 'mood'];
+  
+  for (const [category, labelList] of Object.entries(tagFilter)) {
+    if (excludedCategories.includes(category)) continue;
+    if (labelList.length === 0) continue;
+    for (const label of labelList) {
+      categories.push(category);
+      labels.push(label);
+    }
+  }
+  
+  if (categories.length === 0) return null;
+  return { categories, labels };
+}
+
+export async function getPhotosPerUserId(userId: string, filters?: FilterState): Promise<Photo[]> {
   try {
-    const data = await sql<
-      Photo[]
-    >`SELECT * FROM photos WHERE user_id = ${userId}`;
-    const photos = data.map((photo) => ({
-      ...photo,
-    }));
-    return photos;
+    const { from, to } = buildDateCondition(filters?.date);
+    const tagConditions = buildTagConditions(filters?.tags);
+    
+    let query = sql`SELECT * FROM photos WHERE user_id = ${userId}`;
+    
+    if (from) {
+      query = sql`${query} AND last_modified >= ${from}`;
+    }
+    if (to) {
+      query = sql`${query} AND last_modified <= ${to}`;
+    }
+    if (tagConditions) {
+      query = sql`${query} AND photo_id IN (
+        SELECT DISTINCT photo_id FROM tags 
+        WHERE category = ANY(${tagConditions.categories}) 
+        AND label = ANY(${tagConditions.labels})
+      )`;
+    }
+    
+    query = sql`${query} ORDER BY last_modified DESC`;
+    
+    const data = await query as unknown as Photo[];
+    return data.map((photo) => ({ ...photo }));
   } catch (e) {
     console.error(e, "SQL Error: ");
     throw new Error("Failed to fetch images");
@@ -64,8 +115,8 @@ async function getPresignedPhotoUrl(photoKey: string) {
   return url;
 }
 
-export async function getAllPresignedPhotos(userId: string) {
-  const photos = await getPhotosPerUserId(userId);
+export async function getAllPresignedPhotos(userId: string, filters?: FilterState) {
+  const photos = await getPhotosPerUserId(userId, filters);
   const photoUrls = await Promise.all(
     photos.map(async (photo) => {
       const key = photo.s3_key;
@@ -77,10 +128,11 @@ export async function getAllPresignedPhotos(userId: string) {
   return { photos: photos, urls: photoUrls };
 }
 
-export async function getCurrentUserPhotos() {
+export async function getCurrentUserPhotos(filters?: FilterState) {
+  unstable_noStore();
   const s = await auth.api.getSession({ headers: await headers() });
   if (!s) return null;
-  return getAllPresignedPhotos(s.user.id);
+  return getAllPresignedPhotos(s.user.id, filters);
 }
 
 export async function refreshPresignedUrl(s3Key: string) {
@@ -215,12 +267,33 @@ export async function getAlbum(albumId: string) {
   return albums[0] ?? null;
 }
 
-export async function getAlbumPhotos(albumId: string) {
+export async function getAlbumPhotos(albumId: string, filters?: FilterState) {
+  unstable_noStore();
   const s = await auth.api.getSession({ headers: await headers() });
   if (!s) return null;
-  const photos = await sql<Photo[]>`
-    SELECT * FROM photos WHERE album_id = ${albumId} AND user_id = ${s.user.id}
-  `;
+  
+  const { from, to } = buildDateCondition(filters?.date);
+  const tagConditions = buildTagConditions(filters?.tags);
+  
+  let query = sql`SELECT * FROM photos WHERE album_id = ${albumId} AND user_id = ${s.user.id}`;
+  
+  if (from) {
+    query = sql`${query} AND last_modified >= ${from}`;
+  }
+  if (to) {
+    query = sql`${query} AND last_modified <= ${to}`;
+  }
+  if (tagConditions) {
+    query = sql`${query} AND photo_id IN (
+      SELECT DISTINCT photo_id FROM tags 
+      WHERE category = ANY(${tagConditions.categories}) 
+      AND label = ANY(${tagConditions.labels})
+    )`;
+  }
+  
+  query = sql`${query} ORDER BY last_modified DESC`;
+  
+  const photos = await query as unknown as Photo[];
   const urls = await Promise.all(
     photos.map((photo) => getPresignedPhotoUrl(photo.s3_key)),
   );
