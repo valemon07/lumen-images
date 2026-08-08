@@ -5,18 +5,30 @@ import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_noStore } from "next/cache";
-import { Album, AlbumWithPreviews, Photo, AnalysisResult, Tag, FilterState, DateFilter, TagFilter } from "./types";
+import {
+  Album,
+  AlbumWithPreviews,
+  Photo,
+  AnalysisResult,
+  Tag,
+  FilterState,
+  DateFilter,
+  TagFilter,
+} from "./types";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
 });
 
-function buildDateCondition(dateFilter: DateFilter | undefined): { from: Date | null; to: Date | null } {
-  if (!dateFilter || dateFilter.type === 'all') {
+function buildDateCondition(dateFilter: DateFilter | undefined): {
+  from: Date | null;
+  to: Date | null;
+} {
+  if (!dateFilter || dateFilter.type === "all") {
     return { from: null, to: null };
   }
   const now = new Date();
-  if (dateFilter.type === 'preset') {
+  if (dateFilter.type === "preset") {
     const daysAgo = new Date(now);
     daysAgo.setDate(now.getDate() - dateFilter.days);
     return { from: daysAgo, to: now };
@@ -24,14 +36,16 @@ function buildDateCondition(dateFilter: DateFilter | undefined): { from: Date | 
   return { from: dateFilter.from, to: dateFilter.to };
 }
 
-function buildTagConditions(tagFilter: TagFilter | undefined): { categories: string[]; labels: string[] } | null {
+function buildTagConditions(
+  tagFilter: TagFilter | undefined,
+): { categories: string[]; labels: string[] } | null {
   if (!tagFilter || Object.keys(tagFilter).length === 0) {
     return null;
   }
   const categories: string[] = [];
   const labels: string[] = [];
-  const excludedCategories = ['subjects', 'mood'];
-  
+  const excludedCategories = ["subjects", "mood"];
+
   for (const [category, labelList] of Object.entries(tagFilter)) {
     if (excludedCategories.includes(category)) continue;
     if (labelList.length === 0) continue;
@@ -40,18 +54,21 @@ function buildTagConditions(tagFilter: TagFilter | undefined): { categories: str
       labels.push(label);
     }
   }
-  
+
   if (categories.length === 0) return null;
   return { categories, labels };
 }
 
-export async function getPhotosPerUserId(userId: string, filters?: FilterState): Promise<Photo[]> {
+export async function getPhotosPerUserId(
+  userId: string,
+  filters?: FilterState,
+): Promise<Photo[]> {
   try {
     const { from, to } = buildDateCondition(filters?.date);
     const tagConditions = buildTagConditions(filters?.tags);
-    
+
     let query = sql`SELECT * FROM photos WHERE user_id = ${userId}`;
-    
+
     if (from) {
       query = sql`${query} AND last_modified >= ${from}`;
     }
@@ -65,10 +82,10 @@ export async function getPhotosPerUserId(userId: string, filters?: FilterState):
         AND label = ANY(${tagConditions.labels})
       )`;
     }
-    
+
     query = sql`${query} ORDER BY last_modified DESC`;
-    
-    const data = await query as unknown as Photo[];
+
+    const data = (await query) as unknown as Photo[];
     return data.map((photo) => ({ ...photo }));
   } catch (e) {
     console.error(e, "SQL Error: ");
@@ -115,7 +132,10 @@ async function getPresignedPhotoUrl(photoKey: string) {
   return url;
 }
 
-export async function getAllPresignedPhotos(userId: string, filters?: FilterState) {
+export async function getAllPresignedPhotos(
+  userId: string,
+  filters?: FilterState,
+) {
   const photos = await getPhotosPerUserId(userId, filters);
   const photoUrls = await Promise.all(
     photos.map(async (photo) => {
@@ -188,6 +208,24 @@ export async function createAlbum(name: string) {
     } catch (e) {
       console.log("SQL failure ", e);
     }
+  }
+}
+
+export async function updatePhotoAlbum(
+  photoId: string,
+  albumId: string | null,
+) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return null;
+  try {
+    await sql`
+      UPDATE photos SET album_id = ${albumId}
+      WHERE photo_id = ${photoId} AND user_id = ${session.user.id}
+    `;
+    return true;
+  } catch (e) {
+    console.error("Failed to update photo album: ", e);
+    return null;
   }
 }
 
@@ -271,12 +309,12 @@ export async function getAlbumPhotos(albumId: string, filters?: FilterState) {
   unstable_noStore();
   const s = await auth.api.getSession({ headers: await headers() });
   if (!s) return null;
-  
+
   const { from, to } = buildDateCondition(filters?.date);
   const tagConditions = buildTagConditions(filters?.tags);
-  
+
   let query = sql`SELECT * FROM photos WHERE album_id = ${albumId} AND user_id = ${s.user.id}`;
-  
+
   if (from) {
     query = sql`${query} AND last_modified >= ${from}`;
   }
@@ -290,17 +328,20 @@ export async function getAlbumPhotos(albumId: string, filters?: FilterState) {
       AND label = ANY(${tagConditions.labels})
     )`;
   }
-  
+
   query = sql`${query} ORDER BY last_modified DESC`;
-  
-  const photos = await query as unknown as Photo[];
+
+  const photos = (await query) as unknown as Photo[];
   const urls = await Promise.all(
     photos.map((photo) => getPresignedPhotoUrl(photo.s3_key)),
   );
   return { photos, urls };
 }
 
-export async function insertPhotoTags(photoId: string, analysis: AnalysisResult) {
+export async function insertPhotoTags(
+  photoId: string,
+  analysis: AnalysisResult,
+) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) throw new Error("Unauthorized");
 

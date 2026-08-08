@@ -1,24 +1,22 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Album } from "../lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusIcon, Check, ChevronDown, FolderIcon } from "lucide-react";
 import { createAlbum } from "../lib/actions";
+import { useAlbums } from "./albums-provider";
 
 export default function AlbumUploadChooser({
-  albums: initialAlbums,
   selectedAlbumId,
   onAlbumSelect,
 }: {
-  albums: Album[];
   selectedAlbumId: string | null;
   onAlbumSelect: (albumId: string | null) => void;
 }) {
+  const { albums, albumsLoading, addAlbums } = useAlbums();
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [albums, setAlbums] = useState(initialAlbums);
   const [showCreate, setShowCreate] = useState(false);
   const [newAlbumName, setNewAlbumName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -60,7 +58,7 @@ export default function AlbumUploadChooser({
     try {
       const result = await createAlbum(newAlbumName.trim());
       if (result) {
-        setAlbums((prev) => [...prev, ...result]);
+        addAlbums(result);
         onAlbumSelect(result[0].album_id);
       }
       setNewAlbumName("");
@@ -80,10 +78,15 @@ export default function AlbumUploadChooser({
         className="w-full justify-between"
         onClick={() => setIsOpen(!isOpen)}
         type="button"
+        disabled={albumsLoading}
       >
         <span className="flex items-center gap-2 truncate">
           <FolderIcon className="h-4 w-4 shrink-0" />
-          {selectedAlbum ? selectedAlbum.album_name : "No album selected"}
+          {albumsLoading
+            ? "Loading albums..."
+            : selectedAlbum
+              ? selectedAlbum.album_name
+              : "No album selected"}
         </span>
         <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
       </Button>

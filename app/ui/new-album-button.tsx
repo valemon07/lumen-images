@@ -7,15 +7,18 @@ import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createAlbum } from "../lib/actions";
+import { useAlbums } from "./albums-provider";
 
 export default function NewAlbumButton() {
   const router = useRouter();
+  const { addAlbums } = useAlbums();
   const [albumName, setAlbumName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   async function handleSubmit() {
     if (!albumName.trim()) return;
-    await createAlbum(albumName);
+    const result = await createAlbum(albumName);
+    if (result) addAlbums(result);
     setAlbumName("");
     setIsOpen(false);
     router.refresh();

@@ -4,6 +4,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { SidebarNav } from "../ui/sidebar";
+import { AlbumsProvider } from "../ui/albums-provider";
 
 export default function HomeLayout({
   children,
@@ -11,14 +12,16 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <SidebarNav />
-      <SidebarInset>
-        <main className="flex grow">
-          <SidebarTrigger className="absolute my-4" />
-          {children}
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <AlbumsProvider>
+      <SidebarProvider>
+        <SidebarNav />
+        <SidebarInset>
+          <main className="flex grow">
+            <SidebarTrigger className="absolute my-4" />
+            {children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </AlbumsProvider>
   );
 }

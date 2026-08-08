@@ -4,6 +4,8 @@ import {
   DialogTrigger,
   DialogContent,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -23,7 +25,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2Icon, SearchIcon, Loader2Icon } from "lucide-react";
+import { Trash2Icon, SearchIcon, Loader2Icon, FolderIcon } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -31,7 +33,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { refreshPresignedUrl, getPhotoTags } from "../lib/actions";
+import {
+  refreshPresignedUrl,
+  getPhotoTags,
+  updatePhotoAlbum,
+} from "../lib/actions";
+import AlbumUploadChooser from "./album-upload-chooser";
 
 const MAX_RETRIES = 3;
 
@@ -49,6 +56,8 @@ export default function PhotoCard(props: {
   const [analyzing, setAnalyzing] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [tagsLoading, setTagsLoading] = useState(false);
+  const [albumId, setAlbumId] = useState<string | null>(photo.album_id ?? null);
+  const [albumDialogOpen, setAlbumDialogOpen] = useState(false);
   const attemptsRef = useRef(0);
   const retryingRef = useRef(false);
 
@@ -70,6 +79,20 @@ export default function PhotoCard(props: {
       alert("Failed to analyze image: " + error);
     } finally {
       setAnalyzing(false);
+    }
+  };
+
+  const handleAlbumSelect = async (newAlbumId: string | null) => {
+    const result = await updatePhotoAlbum(photo.photo_id, newAlbumId);
+    if (result) {
+      setAlbumId(newAlbumId);
+      setAlbumDialogOpen(false);
+      toast.success(
+        newAlbumId ? "Photo added to album" : "Photo removed from album",
+      );
+      window.dispatchEvent(new CustomEvent("photo-album-changed"));
+    } else {
+      toast.error("Failed to update album");
     }
   };
 
@@ -104,6 +127,7 @@ export default function PhotoCard(props: {
         try {
           const photoTags = await getPhotoTags(photo.photo_id);
           setTags(photoTags);
+          console.log(photoTags);
         } catch (error) {
           console.error("Failed to fetch tags:", error);
         } finally {
@@ -231,6 +255,23 @@ export default function PhotoCard(props: {
             </Accordion>
           )}
           <div className="flex flex-row items-start gap-2 self-start">
+            <Dialog open={albumDialogOpen} onOpenChange={setAlbumDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <FolderIcon className="mr-2 h-4 w-4" />
+                  {albumId ? "Album" : "Add to Album"}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Select Album</DialogTitle>
+                </DialogHeader>
+                <AlbumUploadChooser
+                  selectedAlbumId={albumId}
+                  onAlbumSelect={handleAlbumSelect}
+                />
+              </DialogContent>
+            </Dialog>
             {tags.length < 0 && (
               <Button
                 variant="outline"

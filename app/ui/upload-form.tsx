@@ -1,13 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import MyDropzone, { type PreviewFile, type UploadStatus } from "./dropzone";
 import AlbumUploadChooser from "./album-upload-chooser";
-import { getCurrentUserAlbums } from "../lib/actions";
-import type { Album } from "../lib/types";
 
 function getImageDimensions(
   file: File,
@@ -66,22 +64,11 @@ export default function UploadForm({
   onUploadingChange?: (uploading: boolean) => void;
 }) {
   const [files, setFiles] = useState<PreviewFile[]>([]);
-  const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(
     initialAlbumId ?? null,
   );
-  const [albumsLoading, setAlbumsLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, UploadStatus>>({});
-
-  useEffect(() => {
-    getCurrentUserAlbums().then((result) => {
-      if (result) {
-        setAlbums(result);
-      }
-      setAlbumsLoading(false);
-    });
-  }, []);
 
   const handleFilesChange = (updater: React.SetStateAction<PreviewFile[]>) => {
     setStatuses({});
@@ -141,15 +128,10 @@ export default function UploadForm({
           <label className="text-sm font-medium mb-1.5 block">
             Album (optional)
           </label>
-          {albumsLoading ? (
-            <div className="h-9 rounded-md border bg-muted animate-pulse" />
-          ) : (
-            <AlbumUploadChooser
-              albums={albums}
-              selectedAlbumId={selectedAlbumId}
-              onAlbumSelect={setSelectedAlbumId}
-            />
-          )}
+          <AlbumUploadChooser
+            selectedAlbumId={selectedAlbumId}
+            onAlbumSelect={setSelectedAlbumId}
+          />
         </div>
         <MyDropzone
           files={files}

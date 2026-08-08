@@ -50,7 +50,11 @@ export default function AlbumPhotosContainer({ albumId, filters }: AlbumPhotosCo
   useEffect(() => {
     const handler = () => loadPhotos(debouncedFilters);
     window.addEventListener("photo-uploaded", handler);
-    return () => window.removeEventListener("photo-uploaded", handler);
+    window.addEventListener("photo-album-changed", handler);
+    return () => {
+      window.removeEventListener("photo-uploaded", handler);
+      window.removeEventListener("photo-album-changed", handler);
+    };
   }, [loadPhotos, debouncedFilters]);
 
   if (loading) {
