@@ -230,7 +230,7 @@ export default function PhotoCard(props: {
               </AccordionItem>
             </Accordion>
           )}
-          <div className="flex-col space-x-2">
+          <div className="flex flex-row items-start gap-2 self-start">
             <Button
               variant="outline"
               onClick={handleAnalyze}
