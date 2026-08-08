@@ -231,18 +231,20 @@ export default function PhotoCard(props: {
             </Accordion>
           )}
           <div className="flex flex-row items-start gap-2 self-start">
-            <Button
-              variant="outline"
-              onClick={handleAnalyze}
-              disabled={analyzing}
-            >
-              {analyzing ? (
-                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <SearchIcon className="mr-2 h-4 w-4" />
-              )}
-              Analyze
-            </Button>
+            {tags.length < 0 && (
+              <Button
+                variant="outline"
+                onClick={handleAnalyze}
+                disabled={analyzing}
+              >
+                {analyzing ? (
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <SearchIcon className="mr-2 h-4 w-4" />
+                )}
+                Analyze
+              </Button>
+            )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant={"destructive"}>Delete</Button>
