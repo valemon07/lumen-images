@@ -54,7 +54,7 @@ export default function PhotoCard(props: {
   const [currentUrl, setCurrentUrl] = useState(url);
   const [failed, setFailed] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<Tag[] | null>(null);
   const [tagsLoading, setTagsLoading] = useState(false);
   const [albumId, setAlbumId] = useState<string | null>(photo.album_id ?? null);
   const [albumDialogOpen, setAlbumDialogOpen] = useState(false);
@@ -121,7 +121,7 @@ export default function PhotoCard(props: {
   }, [photo.s3_key]);
 
   useEffect(() => {
-    if (modalOpen && tags.length === 0 && !tagsLoading) {
+    if (modalOpen && !tags && !tagsLoading) {
       const fetchTags = async () => {
         setTagsLoading(true);
         try {
@@ -136,7 +136,7 @@ export default function PhotoCard(props: {
       };
       fetchTags();
     }
-  }, [modalOpen, photo.photo_id, tags.length, tagsLoading]);
+  }, [modalOpen, photo.photo_id, tags, tagsLoading]);
 
   const imgWidth = photo.width ?? 3;
   const imgHeight = photo.height ?? 2;
@@ -223,7 +223,7 @@ export default function PhotoCard(props: {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          {tags.length > 0 && (
+          {tags && tags.length > 0 && (
             <Accordion type="single" collapsible>
               <AccordionItem value="tags">
                 <AccordionTrigger>View Tags...</AccordionTrigger>
@@ -272,7 +272,7 @@ export default function PhotoCard(props: {
                 />
               </DialogContent>
             </Dialog>
-            {tags.length < 0 && (
+            {(!tags || tags.length === 0) && (
               <Button
                 variant="outline"
                 onClick={handleAnalyze}
