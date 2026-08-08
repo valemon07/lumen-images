@@ -142,7 +142,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
               <ChevronDownIcon className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[200px]">
+          <DropdownMenuContent align="start" className="min-w-50">
             <DropdownMenuLabel className="font-medium">
               {CATEGORY_LABELS[category]}
             </DropdownMenuLabel>
