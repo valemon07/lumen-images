@@ -24,6 +24,7 @@ import {
 import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
 import { authClient } from "../lib/auth-client";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 async function signOut() {
   await authClient.signOut({
@@ -45,9 +46,11 @@ export default function AccountMenu() {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserIcon />
-            Profile
+          <DropdownMenuItem asChild>
+            <Link href="/home/prefs">
+              <UserIcon />
+              Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <SettingsIcon />
