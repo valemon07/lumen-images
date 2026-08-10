@@ -1,6 +1,11 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { nextCookies } from "better-auth/next-js";
+import {
+  sendVerificationEmail,
+  sendChangeEmailConfirmation,
+  sendDeleteAccountVerification,
+} from "./email";
 
 const pool = new Pool({
   host: process.env.DATABASE_HOST,
@@ -16,6 +21,25 @@ export const auth = betterAuth({
   database: pool,
   emailAndPassword: {
     enabled: true,
+  },
+  emailVerification: {
+    sendVerificationEmail,
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailConfirmation,
+    },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification,
+    },
+    additionalFields: {
+      name: {
+        type: "string",
+        required: false,
+      },
+    },
   },
   session: {
     cookieCache: {

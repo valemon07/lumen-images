@@ -1,4 +1,5 @@
 import { Separator } from "@/components/ui/separator";
+import SettingsClient from "./SettingsClient";
 
 export default function Page() {
   return (
@@ -7,6 +8,7 @@ export default function Page() {
         <div className="text-2xl font-medium">Profile Settings</div>
       </div>
       <Separator />
+      <SettingsClient />
     </div>
   );
 }
