@@ -21,10 +21,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
+import { LogOutIcon, SettingsIcon, UserIcon, Sun, Moon, Monitor } from "lucide-react";
 import { authClient } from "../lib/auth-client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+import {
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu";
 
 async function signOut() {
   await authClient.signOut({
@@ -37,6 +45,8 @@ async function signOut() {
 }
 
 export default function AccountMenu() {
+  const { setTheme, theme } = useTheme();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -52,10 +62,28 @@ export default function AccountMenu() {
               Profile
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <SettingsIcon />
-            Settings
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <SettingsIcon />
+              Theme
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+                <DropdownMenuRadioItem value="light">
+                  <Sun className="mr-2 h-4 w-4" />
+                  Light
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">
+                  <Moon className="mr-2 h-4 w-4" />
+                  Dark
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">
+                  <Monitor className="mr-2 h-4 w-4" />
+                  System
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <AlertDialog>
