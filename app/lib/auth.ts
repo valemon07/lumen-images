@@ -21,9 +21,11 @@ export const auth = betterAuth({
   database: pool,
   emailAndPassword: {
     enabled: true,
+    autoSignIn: false,
   },
   emailVerification: {
     sendVerificationEmail,
+    sendOnSignUp: true,
   },
   user: {
     changeEmail: {

@@ -45,7 +45,7 @@ export async function signUpEmail(
   } catch (error) {
     return `Something went wrong: ${error}`;
   }
-  if (isSuccessful) redirect("/home");
+  if (isSuccessful) redirect("/verify-email");
 }
 
 export async function authenticate(
