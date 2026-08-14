@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/sidebar";
 import AccountMenu from "./accounts-menu";
 import Link from "next/link";
-import { Album, Home, Image as ImageIcon, Upload } from "lucide-react";
+import {
+  Album,
+  Home,
+  Image as ImageIcon,
+  Sparkles,
+  Upload,
+} from "lucide-react";
 
 export function SidebarNav() {
   return (
@@ -59,6 +65,20 @@ export function SidebarNav() {
                   </div>
                   <div className="flex flex-col gap-0.5 leading-none">
                     <span>Albums</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="default" asChild>
+                <Link href="/home/insights">
+                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
+                    <Sparkles className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span>Insights</span>
                   </div>
                 </Link>
               </SidebarMenuButton>
