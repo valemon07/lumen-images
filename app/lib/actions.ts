@@ -14,6 +14,8 @@ import {
   FilterState,
   DateFilter,
   TagFilter,
+  InsightsData,
+  CategoryStat,
 } from "./types";
 
 const s3Client = new S3Client({
@@ -394,4 +396,88 @@ export async function getPhotoTags(photoId: string): Promise<Tag[]> {
     SELECT * FROM tags WHERE photo_id = ${photoId}
   `;
   return tags;
+}
+
+type TagCountRow = { label: string; count: number };
+
+async function getCategoryStats(
+  userId: string,
+  category: string,
+  taggedPhotos: number,
+): Promise<CategoryStat[]> {
+  const rows = await sql<TagCountRow[]>`
+    SELECT label, COUNT(*) AS count
+    FROM tags t
+    JOIN photos p ON p.photo_id = t.photo_id
+    WHERE p.user_id = ${userId} AND t.category = ${category}
+    GROUP BY t.label
+    ORDER BY count DESC
+  `;
+  return rows.map((row) => ({
+    label: row.label,
+    count: row.count,
+    percentage:
+      taggedPhotos > 0 ? Math.round((row.count / taggedPhotos) * 100) : 0,
+  }));
+}
+
+async function getTopTags(
+  userId: string,
+  category: string,
+  limit: number,
+): Promise<{ label: string; count: number }[]> {
+  return sql<TagCountRow[]>`
+    SELECT label, COUNT(*) AS count
+    FROM tags t
+    JOIN photos p ON p.photo_id = t.photo_id
+    WHERE p.user_id = ${userId} AND t.category = ${category}
+    GROUP BY t.label
+    ORDER BY count DESC
+    LIMIT ${limit}
+  `;
+}
+
+export async function getUserInsights(): Promise<InsightsData | null> {
+  unstable_noStore();
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return null;
+
+  const totalRows = await sql<{ count: number }[]>`
+    SELECT COUNT(*) AS count FROM photos WHERE user_id = ${session.user.id}
+  `;
+  const totalPhotos = totalRows[0]?.count ?? 0;
+
+  const taggedRows = await sql<{ count: number }[]>`
+    SELECT COUNT(DISTINCT t.photo_id) AS count
+    FROM tags t
+    JOIN photos p ON p.photo_id = t.photo_id
+    WHERE p.user_id = ${session.user.id}
+  `;
+  const taggedPhotos = taggedRows[0]?.count ?? 0;
+
+  if (taggedPhotos === 0) {
+    return { totalPhotos, taggedPhotos, perCategory: { setting: [], timeOfDay: [], weather: [], colorPalette: [], composition: [] }, topSubjects: [], topMoods: [] };
+  }
+
+  const [setting, timeOfDay, weather, colorPalette, composition] =
+    await Promise.all([
+      getCategoryStats(session.user.id, "setting", taggedPhotos),
+      getCategoryStats(session.user.id, "timeOfDay", taggedPhotos),
+      getCategoryStats(session.user.id, "weather", taggedPhotos),
+      getCategoryStats(session.user.id, "colorPalette", taggedPhotos),
+      getCategoryStats(session.user.id, "composition", taggedPhotos),
+    ]);
+
+  const [topSubjects, topMoods] = await Promise.all([
+    getTopTags(session.user.id, "subjects", 10),
+    getTopTags(session.user.id, "mood", 10),
+  ]);
+
+  return {
+    totalPhotos,
+    taggedPhotos,
+    perCategory: { setting, timeOfDay, weather, colorPalette, composition },
+    topSubjects,
+    topMoods,
+  };
 }
