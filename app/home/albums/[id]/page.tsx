@@ -1,8 +1,6 @@
-import { Suspense } from "react";
 import { Separator } from "@/components/ui/separator";
 import AlbumPhotosClient from "./album-photos-client";
 import { getAlbum } from "@/app/lib/actions";
-import Loading from "../../loading";
 
 export default async function Page({
   params,
@@ -27,9 +25,7 @@ export default async function Page({
       <div className="font-medium text-2xl mx-8 my-4">{album.album_name}</div>
       <Separator />
       <main className="flex flex-col grow justify-center items-center w-auto h-auto m-8">
-        <Suspense fallback={<Loading />}>
-          <AlbumPhotosClient albumId={id} />
-        </Suspense>
+        <AlbumPhotosClient albumId={id} />
       </main>
     </div>
   );
