@@ -456,7 +456,19 @@ export async function getUserInsights(): Promise<InsightsData | null> {
   const taggedPhotos = taggedRows[0]?.count ?? 0;
 
   if (taggedPhotos === 0) {
-    return { totalPhotos, taggedPhotos, perCategory: { setting: [], timeOfDay: [], weather: [], colorPalette: [], composition: [] }, topSubjects: [], topMoods: [] };
+    return {
+      totalPhotos,
+      taggedPhotos,
+      perCategory: {
+        setting: [],
+        timeOfDay: [],
+        weather: [],
+        colorPalette: [],
+        composition: [],
+      },
+      topSubjects: [],
+      topMoods: [],
+    };
   }
 
   const [setting, timeOfDay, weather, colorPalette, composition] =
@@ -469,8 +481,8 @@ export async function getUserInsights(): Promise<InsightsData | null> {
     ]);
 
   const [topSubjects, topMoods] = await Promise.all([
-    getTopTags(session.user.id, "subjects", 10),
-    getTopTags(session.user.id, "mood", 10),
+    getTopTags(session.user.id, "subjects", 5),
+    getTopTags(session.user.id, "mood", 5),
   ]);
 
   return {

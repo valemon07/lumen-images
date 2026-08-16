@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Building2,
   Camera,
@@ -74,7 +69,9 @@ function BreakdownCard({
             <div className="h-2 w-full rounded-full bg-muted">
               <div
                 className={cn("h-full rounded-full bg-primary")}
-                style={{ width: `${Math.max(stat.percentage, stat.count > 0 ? 2 : 0)}%` }}
+                style={{
+                  width: `${Math.max(stat.percentage, stat.count > 0 ? 2 : 0)}%`,
+                }}
               />
             </div>
           </div>
