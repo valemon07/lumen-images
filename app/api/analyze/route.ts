@@ -5,9 +5,10 @@ import sql from "@/app/lib/db";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { insertPhotoTags } from "@/app/lib/actions";
+import { env } from "@/lib/env";
 
-const ai = new GoogleGenAI({});
-const s3Client = new S3Client({ region: process.env.AWS_REGION });
+const ai = new GoogleGenAI({ apiKey: env.GOOGLE_API_KEY });
+const s3Client = new S3Client({ region: env.AWS_REGION });
 
 const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
 
@@ -168,8 +169,8 @@ export async function POST(request: Request) {
 
     const { s3_key } = photos[0];
 
-    const region = process.env.AWS_REGION;
-    const bucket = process.env.AWS_BUCKET_NAME;
+    const region = env.AWS_REGION;
+    const bucket = env.AWS_BUCKET_NAME;
 
     if (!region || !bucket) {
       return Response.json(

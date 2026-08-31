@@ -1,12 +1,13 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { env } from "@/lib/env";
 
 export async function POST(request: Request) {
   const { key } = await request.json();
 
   try {
-    const region = process.env.AWS_REGION;
-    const bucket = process.env.AWS_BUCKET_NAME;
+    const region = env.AWS_REGION;
+    const bucket = env.AWS_BUCKET_NAME;
 
     if (!region || !bucket) {
       return Response.json(

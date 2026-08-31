@@ -1,11 +1,12 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { sendPhotoToDatabase } from "@/app/lib/actions";
+import { env } from "@/lib/env";
 
 export async function POST(request: Request) {
   try {
-    const region = process.env.AWS_REGION;
-    const bucket = process.env.AWS_BUCKET_NAME;
+    const region = env.AWS_REGION;
+    const bucket = env.AWS_BUCKET_NAME;
 
     if (!region || !bucket) {
       return Response.json(

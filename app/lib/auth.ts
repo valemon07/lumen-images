@@ -6,12 +6,13 @@ import {
   sendChangeEmailConfirmation,
   sendDeleteAccountVerification,
 } from "./email";
+import { env } from "@/lib/env";
 
 const pool = new Pool({
-  host: process.env.DATABASE_HOST,
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_NAME,
+  host: env.DATABASE_HOST,
+  user: env.DATABASE_USER,
+  password: env.DATABASE_PASSWORD,
+  database: env.DATABASE_NAME,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

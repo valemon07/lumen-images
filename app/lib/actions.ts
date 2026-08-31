@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_noStore } from "next/cache";
+import { env } from "@/lib/env";
 import {
   Album,
   AlbumWithPreviews,
@@ -17,7 +18,7 @@ import {
 } from "./types";
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: env.AWS_REGION,
 });
 
 function buildDateCondition(dateFilter: DateFilter | undefined): {
@@ -121,8 +122,8 @@ export async function sendPhotoToDatabase(
 
 async function getPresignedPhotoUrl(photoKey: string) {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: photoKey, // e.g., "profiles/user-123.jpg"
+    Bucket: env.AWS_BUCKET_NAME,
+    Key: photoKey,
   });
 
   // Generates a URL that expires in 3600 seconds (1 hour)
@@ -169,7 +170,7 @@ export async function refreshPresignedUrl(s3Key: string) {
 
 export async function deletePhoto(photo: Photo) {
   const response = await fetch(
-    process.env.NEXT_PUBLIC_BASE_URL + "/api/delete",
+    env.NEXT_PUBLIC_BASE_URL + "/api/delete",
     {
       method: "POST",
       headers: {

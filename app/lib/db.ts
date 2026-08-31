@@ -1,6 +1,7 @@
 import postgres from "postgres";
+import { env } from "@/lib/env";
 
-const connectionString = process.env.DATABASE_URL;
-const sql = postgres(connectionString!, { ssl: "require" });
+const connectionString = env.DATABASE_URL;
+const sql = postgres(connectionString, { ssl: "require" });
 
 export default sql;
