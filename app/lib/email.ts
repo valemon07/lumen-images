@@ -18,6 +18,21 @@ export async function sendVerificationEmail({
   });
 }
 
+export async function sendResetPassword({
+  user,
+  url,
+}: {
+  user: { email: string };
+  url: string;
+}) {
+  await resend.emails.send({
+    from: "Lumen Images <noreply@lumen-images.local>",
+    to: user.email,
+    subject: "Reset your password",
+    html: `<p>You requested to reset your password.</p><p>Click the link below to reset your password:</p><p><a href="${url}">${url}</a></p>`,
+  });
+}
+
 export async function sendChangeEmailConfirmation({
   user,
   newEmail,

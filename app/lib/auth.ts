@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { nextCookies } from "better-auth/next-js";
 import {
   sendVerificationEmail,
+  sendResetPassword,
   sendChangeEmailConfirmation,
   sendDeleteAccountVerification,
 } from "./email";
@@ -22,9 +23,13 @@ export const auth = betterAuth({
   database: pool,
   emailAndPassword: {
     enabled: true,
+    autoSignIn: false,
+    sendResetPassword,
+    revokeSessionsOnPasswordReset: true,
   },
   emailVerification: {
     sendVerificationEmail,
+    sendOnSignUp: true,
   },
   user: {
     changeEmail: {

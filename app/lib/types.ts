@@ -101,6 +101,26 @@ export const CATEGORY_LABELS: Record<FilterCategory, string> = {
   composition: 'Composition',
 };
 
+export type CategoryStat = {
+  label: string;
+  count: number;
+  percentage: number;
+};
+
+export type InsightsData = {
+  totalPhotos: number;
+  taggedPhotos: number;
+  perCategory: {
+    setting: CategoryStat[];
+    timeOfDay: CategoryStat[];
+    weather: CategoryStat[];
+    colorPalette: CategoryStat[];
+    composition: CategoryStat[];
+  };
+  topSubjects: { label: string; count: number }[];
+  topMoods: { label: string; count: number }[];
+};
+
 export const CATEGORY_OPTIONS: Record<FilterCategory, string[]> = {
   setting: ['indoor', 'outdoor', 'studio'],
   timeOfDay: ['dawn', 'morning', 'midday', 'afternoon', 'golden hour', 'dusk', 'night'],
