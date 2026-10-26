@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
-import { Skeleton, SkeletonFilterBar, SkeletonImage } from "@/app/ui/skeletons";
+import { SkeletonFilterBar, SkeletonImage } from "@/app/ui/skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
