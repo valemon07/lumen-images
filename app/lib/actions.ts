@@ -2,7 +2,7 @@
 import sql from "./db";
 import { auth } from "./auth";
 import { headers } from "next/headers";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_noStore } from "next/cache";
 import { env } from "@/lib/env";
@@ -171,30 +171,28 @@ export async function refreshPresignedUrl(s3Key: string) {
 }
 
 export async function deletePhoto(photo: Photo) {
-  const response = await fetch(
-    env.NEXT_PUBLIC_BASE_URL + "/api/delete",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key: photo.s3_key }),
-    },
-  );
-  if (response.ok) {
-    try {
-      console.log("deleting!");
-      await sql`
-        DELETE FROM photos WHERE s3_key=${photo.s3_key}
-        `;
-      console.log("deleted.");
+  if (typeof photo?.s3_key !== "string" || !photo.s3_key.trim()) return false;
 
-      return "Delete successful";
-    } catch (error) {
-      console.log("SQL failure: ", error);
-    }
-  } else {
-    console.log("Failed to delete image");
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) return false;
+
+    const [owned] = await sql<Pick<Photo, "s3_key">[]>`
+      SELECT s3_key FROM photos WHERE s3_key=${photo.s3_key} AND user_id=${session.user.id}
+    `;
+    if (!owned) return false;
+
+    await s3Client.send(new DeleteObjectCommand({
+      Bucket: env.AWS_BUCKET_NAME,
+      Key: owned.s3_key,
+    }));
+    await sql`
+      DELETE FROM photos WHERE s3_key=${owned.s3_key} AND user_id=${session.user.id}
+    `;
+    return true;
+  } catch (error) {
+    console.error("Failed to delete photo:", error);
+    return false;
   }
 }
 
