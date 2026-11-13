@@ -96,32 +96,6 @@ export async function getPhotosPerUserId(
   }
 }
 
-export async function sendPhotoToDatabase(
-  fileName: string,
-  fileSize: number,
-  fileType: string,
-  lastModified: Date,
-  key: string,
-  width?: number,
-  height?: number,
-  albumId?: string,
-) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (session) {
-    const userId = session?.user.id;
-    try {
-      await sql`
-        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key, width, height, album_id)
-        VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key}, ${width ?? null}, ${height ?? null}, ${albumId ?? null})
-        `;
-    } catch (e) {
-      console.error("Error uploading to db: ", e);
-    }
-  }
-}
-
 async function getPresignedPhotoUrl(photoKey: string) {
   const command = new GetObjectCommand({
     Bucket: env.AWS_BUCKET_NAME,
