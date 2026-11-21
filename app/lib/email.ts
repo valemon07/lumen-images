@@ -13,6 +13,15 @@ function escapeHtml(s: string) {
     .replace(/'/g, "&#39;");
 }
 
+// resend.emails.send() resolves with { error } instead of throwing, so check it
+// explicitly. better-auth catches and logs errors thrown from its email callbacks.
+async function sendEmail(message: { to: string; subject: string; html: string }) {
+  const { error } = await resend.emails.send({ from: FROM, ...message });
+  if (error) {
+    throw new Error(`Failed to send "${message.subject}" email: ${error.message}`);
+  }
+}
+
 export async function sendVerificationEmail({
   user,
   url,
@@ -20,8 +29,7 @@ export async function sendVerificationEmail({
   user: { email: string };
   url: string;
 }) {
-  await resend.emails.send({
-    from: FROM,
+  await sendEmail({
     to: user.email,
     subject: "Verify your email address",
     html: `<p>Click the link below to verify your email address:</p><p><a href="${url}">${url}</a></p>`,
@@ -35,8 +43,7 @@ export async function sendResetPassword({
   user: { email: string };
   url: string;
 }) {
-  await resend.emails.send({
-    from: FROM,
+  await sendEmail({
     to: user.email,
     subject: "Reset your password",
     html: `<p>You requested to reset your password.</p><p>Click the link below to reset your password:</p><p><a href="${url}">${url}</a></p>`,
@@ -52,8 +59,7 @@ export async function sendChangeEmailConfirmation({
   newEmail: string;
   url: string;
 }) {
-  await resend.emails.send({
-    from: FROM,
+  await sendEmail({
     to: user.email,
     subject: `Confirm email change to ${newEmail}`,
     html: `<p>You requested to change your email to <strong>${escapeHtml(newEmail)}</strong>.</p><p>Click the link below to confirm this change:</p><p><a href="${url}">${url}</a></p>`,
@@ -67,8 +73,7 @@ export async function sendDeleteAccountVerification({
   user: { email: string };
   url: string;
 }) {
-  await resend.emails.send({
-    from: FROM,
+  await sendEmail({
     to: user.email,
     subject: "Confirm account deletion",
     html: `<p>You requested to delete your account.</p><p>Click the link below to confirm account deletion:</p><p><a href="${url}">${url}</a></p>`,
