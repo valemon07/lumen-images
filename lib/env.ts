@@ -2,10 +2,6 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
-  DATABASE_HOST: z.string(),
-  DATABASE_USER: z.string(),
-  DATABASE_PASSWORD: z.string(),
-  DATABASE_NAME: z.string(),
   AWS_REGION: z.string(),
   AWS_BUCKET_NAME: z.string(),
   EMAIL_FROM: z.string().min(1),
