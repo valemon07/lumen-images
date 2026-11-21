@@ -2,10 +2,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 import Footer from "@/app/ui/footer";
-import Image from "next/image";
-import darkLogo from "../public/dark-logo.png";
-import lightLogo from "../public/light-logo.png";
-import transparentLogo from "../public/logo-transparent.png";
 import { Zap } from "lucide-react";
 
 export default function Home() {

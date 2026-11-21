@@ -8,8 +8,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname:
-          "lumen-images-bucket-695331051566-us-east-1-an.s3.us-east-1.amazonaws.com",
+        hostname: `${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`,
       },
     ],
   },

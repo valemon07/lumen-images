@@ -1,9 +1,8 @@
 "use server";
 
-import sql from "./db";
 import { redirect } from "next/navigation";
+import { APIError } from "better-auth/api";
 import { auth } from "@/app/lib/auth";
-import { User } from "./types";
 
 export type UserState = {
   errors?: {
@@ -13,19 +12,6 @@ export type UserState = {
   };
   message?: string | null;
 };
-
-export async function getUserByEmail(email: string) {
-  try {
-    const returnedUser = await sql<
-      User[]
-    >`SELECT * FROM users WHERE email=${email}`;
-    console.log(returnedUser[0]);
-    return returnedUser[0];
-  } catch (e) {
-    console.error("Failed to fetch user: ", e);
-    throw new Error("Failed to fetch user.");
-  }
-}
 
 export async function signUpEmail(
   prevState: string | undefined,
@@ -43,7 +29,11 @@ export async function signUpEmail(
     });
     isSuccessful = true;
   } catch (error) {
-    return `Something went wrong: ${error}`;
+    console.error("Sign-up failed:", error);
+    if (error instanceof APIError && typeof error.message === "string" && error.message) {
+      return error.message;
+    }
+    return "Sign-up failed. Please try again.";
   }
   if (isSuccessful) redirect("/verify-email");
 }
@@ -63,7 +53,11 @@ export async function authenticate(
     });
     isSuccessful = true;
   } catch (error) {
-    return `Something went wrong: ${error}`;
+    console.error("Sign-in failed:", error);
+    if (error instanceof APIError && Number(error.statusCode) === 403) {
+      return "Please verify your email address before signing in.";
+    }
+    return "Invalid email or password.";
   }
   if (isSuccessful) redirect("/home");
 }
