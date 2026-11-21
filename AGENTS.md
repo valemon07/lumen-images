@@ -11,7 +11,8 @@ Next.js 16 (App Router) + TypeScript photo collection app with:
 - PostgreSQL database (via `postgres` + `pg` for better-auth)
 - AWS S3 for image storage
 - better-auth for authentication (email/password)
-- Google GenAI (Gemini 2.5 Flash) for image analysis
+- Google GenAI (Gemini Flash) for image analysis
+- Resend for transactional email (verification, password reset)
 - shadcn/ui components with Tailwind CSS v4
 
 ## Commands
@@ -20,6 +21,8 @@ pnpm dev        # Start dev server
 pnpm build      # Production build
 pnpm start      # Run production server
 pnpm lint       # Run ESLint
+pnpm typecheck  # tsc --noEmit
+pnpm test       # Unit tests (tests/*.mjs)
 ```
 
 ## Architecture
@@ -31,6 +34,11 @@ pnpm lint       # Run ESLint
 - `app/home/photos/page.tsx` - User photos gallery
 - `app/home/albums/page.tsx` - User albums list
 - `app/home/albums/[id]/page.tsx` - Album detail view
+- `app/home/upload/page.tsx` - Upload page
+- `app/home/insights/page.tsx` - AI tag insights dashboard
+- `app/home/prefs/page.tsx` - Account settings
+- `app/login`, `app/signup`, `app/forgot-password`, `app/reset-password`, `app/verify-email` - Auth pages
+- `proxy.ts` - Redirects unauthenticated requests under `/home/*` to `/login`
 
 ### API Routes
 | Route | Purpose |
@@ -38,12 +46,15 @@ pnpm lint       # Run ESLint
 | `app/api/auth/[...all]/route.ts` | better-auth handler |
 | `app/api/upload/route.ts` | Upload image to S3 + save metadata to DB |
 | `app/api/analyze/route.ts` | Analyze photo with Gemini AI (rate limited: 10/min/user) |
-| `app/api/delete/route.ts` | Delete photo from S3 + DB |
 
 ### Server Libraries (`app/lib/`)
 - `db.ts` - postgres client (requires `DATABASE_URL`)
 - `auth.ts` - better-auth config with pg Pool (requires DATABASE_* vars)
-- `actions.ts` - Server actions for photos/albums (presigned URLs, CRUD)
+- `actions.ts` - Server actions for photos/albums (presigned URLs, CRUD, `deletePhoto`)
+- `tags.ts` - Server-only tag insertion used by `/api/analyze` (intentionally not a server action)
+- `user-actions.ts` / `settings-actions.ts` - Sign-up/sign-in, password change, account deletion
+- `email.ts` - Resend email senders
+- `lib/env.ts` - Zod-validated environment variables
 - `types.ts` - TypeScript types for Photo, Album, AlbumWithPreviews
 - `auth-client.ts` - Client-side better-auth client
 
@@ -51,12 +62,14 @@ pnpm lint       # Run ESLint
 - **Server actions** (`"use server"`) in `actions.ts` for data mutations
 - **Presigned S3 URLs** for secure image access (1hr expiry)
 - **Session auth** via `auth.api.getSession({ headers: await headers() })` in server actions
+- **Every exported function in a `"use server"` file is a public endpoint**: it must check the session and scope queries by `user_id`. Put helpers that take a `userId` argument in non-`"use server"` modules or keep them unexported.
 - **Rate limiting** in-memory Map for `/api/analyze` (10 req/min/user/IP)
 - **Zod schemas** for API validation and Gemini structured output
 
-### Database Schema (inferred)
-- `photos` - file_name, user_id, file_size, file_type, last_modified, s3_key, width, height, album_id
-- `albums` - album_name, user_id
+### Database Schema (see README for DDL)
+- `photos` - photo_id, file_name, user_id, file_size, file_type, last_modified, s3_key, width, height, album_id
+- `albums` - album_id, album_name, user_id
+- `tags` - id, photo_id, category, label, created_at
 
 ### UI Components
 Custom shadcn/ui components in `components/ui/` (button, dialog, dropdown-menu, etc.)

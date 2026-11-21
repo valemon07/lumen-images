@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import sql from "@/app/lib/db";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
-import { insertPhotoTags } from "@/app/lib/actions";
+import { insertPhotoTags } from "@/app/lib/tags";
 import { env } from "@/lib/env";
 
 const ai = new GoogleGenAI({ apiKey: env.GOOGLE_API_KEY });
@@ -38,7 +38,7 @@ function getRateLimitKey(sessionUserId: string, ip?: string): string {
 }
 
 const analysisSchema = z.object({
-  subjects: z.array(z.string()).max(5),
+  subjects: z.array(z.string().trim().min(1).max(50)).max(5),
   setting: z.enum(["indoor", "outdoor", "studio", "unknown"]),
   timeOfDay: z.enum([
     "dawn",
@@ -51,7 +51,7 @@ const analysisSchema = z.object({
     "unknown",
   ]),
   weather: z.enum(["clear", "overcast", "foggy", "rainy", "snowy", "unknown"]),
-  mood: z.string(),
+  mood: z.string().trim().min(1).max(50),
   composition: z.array(
     z.enum([
       "rule of thirds",
@@ -195,7 +195,7 @@ export async function POST(request: Request) {
 
     if (response.ContentLength && response.ContentLength > MAX_IMAGE_SIZE) {
       return Response.json(
-        { error: "Image too large. Maximum size is 10MB." },
+        { error: "Image too large. Maximum size is 20MB." },
         { status: 413 },
       );
     }
@@ -206,7 +206,7 @@ export async function POST(request: Request) {
       totalSize += chunk.length;
       if (totalSize > MAX_IMAGE_SIZE) {
         return Response.json(
-          { error: "Image too large. Maximum size is 10MB." },
+          { error: "Image too large. Maximum size is 20MB." },
           { status: 413 },
         );
       }
@@ -214,14 +214,6 @@ export async function POST(request: Request) {
     }
     const buffer = Buffer.concat(chunks);
     const base64 = buffer.toString("base64");
-
-    console.log(
-      "Successfully converted photo",
-      photoId,
-      "to base64 (length:",
-      base64.length,
-      ")",
-    );
 
     const mimeType = response.ContentType || "image/jpeg";
     const result = await analyzeWithGemini(
@@ -231,9 +223,18 @@ export async function POST(request: Request) {
       analysisSchema,
     );
 
-    await insertPhotoTags(photoId, result);
+    const parsed = analysisSchema.safeParse(result);
+    if (!parsed.success) {
+      console.error("Gemini returned an invalid analysis:", parsed.error);
+      return Response.json(
+        { error: "Analysis failed. Please try again." },
+        { status: 502 },
+      );
+    }
 
-    return Response.json(result);
+    await insertPhotoTags(session.user.id, photoId, parsed.data);
+
+    return Response.json(parsed.data);
   } catch (error) {
     console.error("Analyze error:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

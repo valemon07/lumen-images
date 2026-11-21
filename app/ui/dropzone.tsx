@@ -35,6 +35,12 @@ export default function MyDropzone(props: {
   );
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
+    accept: {
+      "image/jpeg": [".jpg", ".jpeg"],
+      "image/png": [".png"],
+      "image/webp": [".webp"],
+    },
+    maxSize: 20 * 1024 * 1024,
   });
 
   const thumbs = files.map((file) => {

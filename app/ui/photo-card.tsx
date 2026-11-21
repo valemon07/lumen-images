@@ -127,7 +127,6 @@ export default function PhotoCard(props: {
         try {
           const photoTags = await getPhotoTags(photo.photo_id);
           setTags(photoTags);
-          console.log(photoTags);
         } catch (error) {
           console.error("Failed to fetch tags:", error);
         } finally {

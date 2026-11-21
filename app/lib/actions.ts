@@ -2,7 +2,7 @@
 import sql from "./db";
 import { auth } from "./auth";
 import { headers } from "next/headers";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_noStore } from "next/cache";
 import { env } from "@/lib/env";
@@ -10,7 +10,6 @@ import {
   Album,
   AlbumWithPreviews,
   Photo,
-  AnalysisResult,
   Tag,
   FilterState,
   DateFilter,
@@ -62,7 +61,7 @@ function buildTagConditions(
   return { categories, labels };
 }
 
-export async function getPhotosPerUserId(
+async function getPhotosPerUserId(
   userId: string,
   filters?: FilterState,
 ): Promise<Photo[]> {
@@ -96,32 +95,6 @@ export async function getPhotosPerUserId(
   }
 }
 
-export async function sendPhotoToDatabase(
-  fileName: string,
-  fileSize: number,
-  fileType: string,
-  lastModified: Date,
-  key: string,
-  width?: number,
-  height?: number,
-  albumId?: string,
-) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (session) {
-    const userId = session?.user.id;
-    try {
-      await sql`
-        INSERT INTO photos(file_name, user_id, file_size, file_type, last_modified, s3_key, width, height, album_id)
-        VALUES (${fileName}, ${userId}, ${fileSize}, ${fileType}, ${lastModified}, ${key}, ${width ?? null}, ${height ?? null}, ${albumId ?? null})
-        `;
-    } catch (e) {
-      console.error("Error uploading to db: ", e);
-    }
-  }
-}
-
 async function getPresignedPhotoUrl(photoKey: string) {
   const command = new GetObjectCommand({
     Bucket: env.AWS_BUCKET_NAME,
@@ -135,7 +108,7 @@ async function getPresignedPhotoUrl(photoKey: string) {
   return url;
 }
 
-export async function getAllPresignedPhotos(
+async function getAllPresignedPhotos(
   userId: string,
   filters?: FilterState,
 ) {
@@ -171,30 +144,28 @@ export async function refreshPresignedUrl(s3Key: string) {
 }
 
 export async function deletePhoto(photo: Photo) {
-  const response = await fetch(
-    env.NEXT_PUBLIC_BASE_URL + "/api/delete",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key: photo.s3_key }),
-    },
-  );
-  if (response.ok) {
-    try {
-      console.log("deleting!");
-      await sql`
-        DELETE FROM photos WHERE s3_key=${photo.s3_key}
-        `;
-      console.log("deleted.");
+  if (typeof photo?.s3_key !== "string" || !photo.s3_key.trim()) return false;
 
-      return "Delete successful";
-    } catch (error) {
-      console.log("SQL failure: ", error);
-    }
-  } else {
-    console.log("Failed to delete image");
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) return false;
+
+    const [owned] = await sql<Pick<Photo, "s3_key">[]>`
+      SELECT s3_key FROM photos WHERE s3_key=${photo.s3_key} AND user_id=${session.user.id}
+    `;
+    if (!owned) return false;
+
+    await s3Client.send(new DeleteObjectCommand({
+      Bucket: env.AWS_BUCKET_NAME,
+      Key: owned.s3_key,
+    }));
+    await sql`
+      DELETE FROM photos WHERE s3_key=${owned.s3_key} AND user_id=${session.user.id}
+    `;
+    return true;
+  } catch (error) {
+    console.error("Failed to delete photo:", error);
+    return false;
   }
 }
 
@@ -202,14 +173,17 @@ export async function createAlbum(name: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  if (name && session) {
+  if (typeof name !== "string") return;
+  name = name.trim();
+  if (!name || name.length > 100) return;
+  if (session) {
     try {
       const data = await sql<Album[]>`
       INSERT INTO albums(album_name, user_id) VALUES (${name}, ${session.user.id})
       `;
       return data.map((album) => ({ ...album }));
     } catch (e) {
-      console.log("SQL failure ", e);
+      console.error("SQL failure ", e);
     }
   }
 }
@@ -221,6 +195,13 @@ export async function updatePhotoAlbum(
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return null;
   try {
+    if (albumId !== null) {
+      const owned = await sql`
+        SELECT album_id FROM albums
+        WHERE album_id = ${albumId} AND user_id = ${session.user.id}
+      `;
+      if (owned.length === 0) return null;
+    }
     await sql`
       UPDATE photos SET album_id = ${albumId}
       WHERE photo_id = ${photoId} AND user_id = ${session.user.id}
@@ -341,60 +322,14 @@ export async function getAlbumPhotos(albumId: string, filters?: FilterState) {
   return { photos, urls };
 }
 
-export async function insertPhotoTags(
-  photoId: string,
-  analysis: AnalysisResult,
-) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("Unauthorized");
-
-  const owned = await sql<{ photo_id: string }[]>`
-    SELECT photo_id FROM photos WHERE photo_id = ${photoId} AND user_id = ${session.user.id}
-  `;
-  if (owned.length === 0) throw new Error("Photo not found or unauthorized");
-
-  const categories: string[] = [];
-  const labels: string[] = [];
-
-  analysis.subjects.forEach((s) => {
-    categories.push("subjects");
-    labels.push(s);
-  });
-  analysis.composition.forEach((c) => {
-    categories.push("composition");
-    labels.push(c);
-  });
-
-  categories.push("setting");
-  labels.push(analysis.setting);
-
-  categories.push("timeOfDay");
-  labels.push(analysis.timeOfDay);
-
-  categories.push("weather");
-  labels.push(analysis.weather);
-
-  categories.push("mood");
-  labels.push(analysis.mood);
-
-  categories.push("colorPalette");
-  labels.push(analysis.colorPalette);
-
-  await sql.begin(async (tx) => {
-    await tx`
-      INSERT INTO tags (photo_id, category, label)
-      SELECT ${photoId}, c.category, c.label
-      FROM UNNEST(${categories}::text[], ${labels}::text[]) AS c(category, label)
-    `;
-  });
-}
-
 export async function getPhotoTags(photoId: string): Promise<Tag[]> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) throw new Error("Unauthorized");
 
   const tags = await sql<Tag[]>`
-    SELECT * FROM tags WHERE photo_id = ${photoId}
+    SELECT t.* FROM tags t
+    JOIN photos p ON p.photo_id = t.photo_id
+    WHERE t.photo_id = ${photoId} AND p.user_id = ${session.user.id}
   `;
   return tags;
 }

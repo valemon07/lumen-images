@@ -19,7 +19,6 @@ import { Separator } from "@/components/ui/separator";
 import {
   FilterState,
   DateFilter,
-  TagFilter,
   FILTER_CATEGORIES,
   CATEGORY_LABELS,
   CATEGORY_OPTIONS,

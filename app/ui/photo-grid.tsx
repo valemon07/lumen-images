@@ -5,6 +5,7 @@ import PhotoCard from "./photo-card";
 import { deletePhoto } from "../lib/actions";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
+import { toast } from "sonner";
 
 const SCROLL_BUFFER = 600;
 const INITIAL_LOAD = 30;
@@ -54,9 +55,16 @@ export default function PhotoGrid(props: {
     return () => observer.disconnect();
   }, [photoItems.length]);
 
-  const handleDelete = useCallback((photo: Photo) => {
-    setDeletedKeys((prev) => new Set(prev).add(photo.s3_key));
-    deletePhoto(photo);
+  const handleDelete = useCallback(async (photo: Photo) => {
+    try {
+      if (await deletePhoto(photo)) {
+        setDeletedKeys((prev) => new Set(prev).add(photo.s3_key));
+        return;
+      }
+    } catch {
+      // Network failures can reject before the server action returns a result.
+    }
+    toast.error("Failed to delete photo");
   }, []);
 
   const handleClearFilters = useCallback(() => {
