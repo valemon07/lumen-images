@@ -45,6 +45,8 @@ cp .env.example .env
 Fill in every value. `BETTER_AUTH_SECRET` must be at least 32 characters (`openssl rand -base64 32`).
 `EMAIL_FROM` must use a domain verified in Resend.
 
+> **Supabase:** set `DATABASE_URL` to the **Session pooler** connection string (Connect → Session pooler, port 5432). The direct `db.<ref>.supabase.co` host is IPv6-only, and Vercel and many local networks can't reach it.
+
 ### 3. Create the database schema
 Create the better-auth tables:
 ```bash

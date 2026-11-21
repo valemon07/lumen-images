@@ -9,14 +9,16 @@ import {
 } from "./email";
 import { env } from "@/lib/env";
 
+// Shares DATABASE_URL with app/lib/db.ts. With Supabase, use the Session
+// pooler URL: direct db.*.supabase.co hosts are IPv6-only, which Vercel
+// and many local networks cannot reach.
 const pool = new Pool({
-  host: env.DATABASE_HOST,
-  user: env.DATABASE_USER,
-  password: env.DATABASE_PASSWORD,
-  database: env.DATABASE_NAME,
+  connectionString: env.DATABASE_URL,
+  // Encrypted but not certificate-verified, matching `ssl: "require"` in db.ts.
+  ssl: { rejectUnauthorized: false },
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
 });
 
 export const auth = betterAuth({
