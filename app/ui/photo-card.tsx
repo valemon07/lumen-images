@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { Photo, Tag } from "../lib/types";
 
@@ -68,7 +68,6 @@ export default function PhotoCard(props: {
   const [failed, setFailed] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [tags, setTags] = useState<Tag[] | null>(null);
-  const [tagsLoading, setTagsLoading] = useState(false);
   const [albumId, setAlbumId] = useState<string | null>(photo.album_id ?? null);
   const [albumDialogOpen, setAlbumDialogOpen] = useState(false);
   const attemptsRef = useRef(0);
@@ -139,22 +138,19 @@ export default function PhotoCard(props: {
     }
   }, [photo.s3_key]);
 
-  useEffect(() => {
-    if (modalOpen && !tags && !tagsLoading) {
-      const fetchTags = async () => {
-        setTagsLoading(true);
-        try {
-          const photoTags = await getPhotoTags(photo.photo_id);
-          setTags(photoTags);
-        } catch (error) {
-          console.error("Failed to fetch tags:", error);
-        } finally {
-          setTagsLoading(false);
-        }
-      };
-      fetchTags();
+  const tagsRequested = useRef(false);
+  const loadTags = useCallback(async () => {
+    if (tagsRequested.current) return;
+    tagsRequested.current = true;
+    try {
+      const photoTags = await getPhotoTags(photo.photo_id);
+      setTags(photoTags);
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      tagsRequested.current = false;
     }
-  }, [modalOpen, photo.photo_id, tags, tagsLoading]);
+  }, [photo.photo_id]);
+
 
   const imgWidth = photo.width ?? 3;
   const imgHeight = photo.height ?? 2;
@@ -170,6 +166,8 @@ export default function PhotoCard(props: {
     const doc = document as Document & {
       startViewTransition?: (cb: () => void) => { finished: Promise<void> };
     };
+    // Tags usually start loading on pointer down; this covers keyboard opens.
+    if (open && !tags) loadTags();
     const src = thumbRef.current?.currentSrc || null;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const trigger = triggerRef.current;
@@ -192,21 +190,25 @@ export default function PhotoCard(props: {
     transition.finished.finally(() => setLifting(false));
   };
 
-  const readingRows = tags
-    ? READING_ORDER.map(({ category, label }) => ({
-        label,
-        value: tags
-          .filter((t) => t.category === category)
-          .map((t) => t.label)
-          .join(", "),
-      })).filter((r) => r.value)
-    : [];
+  // Always all seven rows, so the record never changes height as it fills in.
+  const readingRows = READING_ORDER.map(({ category, label }) => ({
+    label,
+    value: (tags ?? [])
+      .filter((t) => t.category === category)
+      .map((t) => t.label)
+      .join(", "),
+  }));
+  const tagsPending = !tags;
+  const notRead = tags !== null && tags.length === 0;
 
   return (
     <Dialog open={modalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <button
           ref={triggerRef}
+          onPointerDown={() => {
+            if (!tags) loadTags();
+          }}
           className="grid aspect-square w-full cursor-pointer place-items-center bg-mount p-[6%] text-left hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]">
           <div className="relative size-full">
           {failed ? (
@@ -231,7 +233,7 @@ export default function PhotoCard(props: {
           </div>
         </button>
       </DialogTrigger>
-      <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto data-open:animate-none">
+      <DialogContent className="top-[5vh] min-w-fit translate-y-0 sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto data-open:animate-none">
         <div
           className="relative max-h-[80vh] overflow-hidden bg-mount p-[4%]"
           style={{
@@ -279,26 +281,24 @@ export default function PhotoCard(props: {
             >
               What Lumen read
             </h2>
-            {tagsLoading || (!tags && modalOpen) ? (
-              <div className="mt-3 flex flex-col gap-2" aria-busy="true">
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-4 w-3/5" />
-              </div>
-            ) : readingRows.length > 0 ? (
-              <dl className="grid grid-cols-[8rem_1fr] text-sm">
-                {readingRows.map((r) => (
-                  <div key={r.label} className="contents">
-                    <dt className="border-b border-border py-2 text-muted-foreground">{r.label}</dt>
-                    <dd className="border-b border-border py-2 font-semibold">{r.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Lumen hasn&apos;t read this photo yet. Choose Analyze below.
-              </p>
-            )}
+            <dl className="grid grid-cols-[8rem_1fr] text-sm" aria-busy={tagsPending}>
+              {readingRows.map((r) => (
+                <div key={r.label} className="contents">
+                  <dt className="border-b border-border py-2 text-muted-foreground">{r.label}</dt>
+                  <dd className="flex min-h-9 items-center border-b border-border py-2 font-semibold">
+                    {tagsPending ? (
+                      <Skeleton className="h-3.5 w-32" />
+                    ) : r.value ? (
+                      r.value
+                    ) : (
+                      <span className="font-normal text-muted-foreground">
+                        {notRead ? "Not read yet" : "None"}
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </section>
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
@@ -347,7 +347,7 @@ export default function PhotoCard(props: {
                 />
               </DialogContent>
             </Dialog>
-            {(!tags || tags.length === 0) && (
+            {notRead && (
               <Button
                 variant="outline"
                 onClick={handleAnalyze}
