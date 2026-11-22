@@ -3,14 +3,6 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/app/lib/auth-client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -28,19 +20,19 @@ export default function ResetPasswordClient() {
 
   if (!token || errorParam) {
     return (
-      <Card className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]">
-        <CardHeader>
-          <CardTitle>Invalid or Expired Link</CardTitle>
-          <CardDescription>
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Invalid or Expired Link</h1>
+          <p className="text-base text-muted-foreground">
             This password reset link is invalid or has expired.
-          </CardDescription>
-        </CardHeader>
-        <CardFooter className="flex-col gap-2">
-          <Button asChild className="w-full">
+          </p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button asChild size="lg" className="w-full">
             <Link href="/forgot-password">Request a new link</Link>
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     );
   }
 
@@ -67,37 +59,37 @@ export default function ResetPasswordClient() {
 
   if (success) {
     return (
-      <Card className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]">
-        <CardHeader>
-          <CardTitle>Password Reset</CardTitle>
-          <CardDescription>
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Password reset</h1>
+          <p className="text-base text-muted-foreground">
             Your password has been reset successfully. You can now log in with
             your new password.
-          </CardDescription>
-        </CardHeader>
-        <CardFooter className="flex-col gap-2">
-          <Button asChild className="w-full">
+          </p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button asChild size="lg" className="w-full">
             <Link href="/login">Go to login</Link>
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]"
+      className="mx-auto w-full max-w-sm"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
-          <CardDescription>Enter your new password.</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Reset password</h1>
+          <p className="text-base text-muted-foreground">Enter your new password.</p>
+        </div>
+        <div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">New password</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -111,7 +103,7 @@ export default function ResetPasswordClient() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -125,18 +117,19 @@ export default function ResetPasswordClient() {
               />
             </div>
           </div>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
+        </div>
+        <div className="flex flex-col gap-3">
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button
             type="submit"
+            size="lg"
             className="w-full"
             disabled={loading || !newPassword || !confirmPassword}
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? "Resetting..." : "Reset password"}
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </form>
   );
 }

@@ -81,18 +81,18 @@ export default function AlbumUploadChooser({
         disabled={albumsLoading}
       >
         <span className="flex items-center gap-2 truncate">
-          <FolderIcon className="h-4 w-4 shrink-0" />
+          <FolderIcon className="size-4 shrink-0" />
           {albumsLoading
             ? "Loading albums..."
             : selectedAlbum
               ? selectedAlbum.album_name
               : "No album selected"}
         </span>
-        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+        <ChevronDown className="size-4 shrink-0 opacity-50" />
       </Button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border bg-popover text-popover-foreground shadow-xl p-1">
+        <div className="absolute z-50 mt-1 w-full border border-border bg-popover text-popover-foreground shadow-[0_12px_32px_-16px_rgb(0_0_0/0.35)] p-1 rounded-sm">
           {!showCreate ? (
             <>
               {/* Search */}
@@ -121,7 +121,7 @@ export default function AlbumUploadChooser({
                   <span className="flex-1 text-left text-muted-foreground">
                     None
                   </span>
-                  {selectedAlbumId === null && <Check className="h-4 w-4" />}
+                  {selectedAlbumId === null && <Check className="size-4" />}
                 </button>
 
                 {filteredAlbums.length === 0 ? (
@@ -140,12 +140,12 @@ export default function AlbumUploadChooser({
                       }}
                       type="button"
                     >
-                      <FolderIcon className="h-4 w-4 shrink-0" />
+                      <FolderIcon className="size-4 shrink-0" />
                       <span className="flex-1 text-left truncate">
                         {album.album_name}
                       </span>
                       {selectedAlbumId === album.album_id && (
-                        <Check className="h-4 w-4 shrink-0" />
+                        <Check className="size-4 shrink-0" />
                       )}
                     </button>
                   ))
@@ -164,7 +164,7 @@ export default function AlbumUploadChooser({
                 }}
                 type="button"
               >
-                <PlusIcon className="h-4 w-4 shrink-0" />
+                <PlusIcon className="size-4 shrink-0" />
                 <span>Create new album</span>
               </button>
             </>

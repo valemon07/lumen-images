@@ -10,6 +10,10 @@
     --font-sans: var(--font-sans);
     --font-mono: var(--font-geist-mono);
     --font-heading: var(--font-sans);
+    --font-tape: var(--font-kalam);
+    --color-mount: var(--mount);
+    --color-tape: var(--tape);
+    --color-tape-foreground: var(--tape-foreground);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,6 +31,7 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -49,82 +54,140 @@
 }
 
 :root {
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.852 0.199 91.936);
-    --primary-foreground: oklch(0.421 0.095 57.708);
-    --secondary: oklch(0.967 0.001 286.375);
-    --secondary-foreground: oklch(0.21 0.006 285.885);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.681 0.162 75.834);
-    --sidebar-primary-foreground: oklch(0.987 0.026 102.212);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    /* Lightbox: the lit table. Yellow is the flash, only ever a fill under ink. */
     --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --foreground: oklch(0.2 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2 0 0);
+    --primary: oklch(0.852 0.199 91.936);
+    --primary-foreground: oklch(0.2 0 0);
+    --secondary: oklch(0.955 0.003 106);
+    --secondary-foreground: oklch(0.2 0 0);
+    --muted: oklch(0.955 0.003 106);
+    --muted-foreground: oklch(0.47 0.008 106);
+    --accent: oklch(0.955 0.003 106);
+    --accent-foreground: oklch(0.2 0 0);
+    --destructive: oklch(0.53 0.2 27);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.86 0.004 106);
+    --input: oklch(0.62 0.008 106);
+    --ring: oklch(0.2 0 0);
+    --mount: oklch(0.88 0.004 106);
+    --tape: oklch(0.852 0.199 91.936);
+    --tape-foreground: oklch(0.2 0 0);
+    --chart-1: oklch(0.852 0.199 91.936);
+    --chart-2: oklch(0.2 0 0);
+    --chart-3: oklch(0.47 0.008 106);
+    --chart-4: oklch(0.7 0.006 106);
+    --chart-5: oklch(0.88 0.004 106);
+    --radius: 0.25rem;
+    --sidebar: oklch(0.985 0.002 106);
+    --sidebar-foreground: oklch(0.2 0 0);
+    --sidebar-primary: oklch(0.852 0.199 91.936);
+    --sidebar-primary-foreground: oklch(0.2 0 0);
+    --sidebar-accent: oklch(0.94 0.004 106);
+    --sidebar-accent-foreground: oklch(0.2 0 0);
+    --sidebar-border: oklch(0.86 0.004 106);
+    --sidebar-ring: oklch(0.2 0 0);
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.795 0.184 86.047);
-    --primary-foreground: oklch(0.421 0.095 57.708);
-    --secondary: oklch(0.274 0.006 286.033);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.795 0.184 86.047);
-    --sidebar-primary-foreground: oklch(0.987 0.026 102.212);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    /* The same table with its light switched off. */
+    --background: oklch(0.185 0 0);
+    --foreground: oklch(0.955 0.004 106);
+    --card: oklch(0.22 0.002 106);
+    --card-foreground: oklch(0.955 0.004 106);
+    --popover: oklch(0.22 0.002 106);
+    --popover-foreground: oklch(0.955 0.004 106);
+    --primary: oklch(0.852 0.199 91.936);
+    --primary-foreground: oklch(0.2 0 0);
+    --secondary: oklch(0.26 0.003 106);
+    --secondary-foreground: oklch(0.955 0.004 106);
+    --muted: oklch(0.26 0.003 106);
+    --muted-foreground: oklch(0.74 0.008 106);
+    --accent: oklch(0.26 0.003 106);
+    --accent-foreground: oklch(0.955 0.004 106);
+    --destructive: oklch(0.68 0.19 25);
+    --destructive-foreground: oklch(0.17 0 0);
+    --border: oklch(0.32 0.004 106);
+    --input: oklch(0.55 0.008 106);
+    --ring: oklch(0.955 0.004 106);
+    --mount: oklch(0.285 0.003 106);
+    --tape: oklch(0.852 0.199 91.936);
+    --tape-foreground: oklch(0.2 0 0);
+    --chart-1: oklch(0.852 0.199 91.936);
+    --chart-2: oklch(0.955 0.004 106);
+    --chart-3: oklch(0.74 0.008 106);
+    --chart-4: oklch(0.5 0.006 106);
+    --chart-5: oklch(0.32 0.004 106);
+    --sidebar: oklch(0.205 0.002 106);
+    --sidebar-foreground: oklch(0.955 0.004 106);
+    --sidebar-primary: oklch(0.852 0.199 91.936);
+    --sidebar-primary-foreground: oklch(0.2 0 0);
+    --sidebar-accent: oklch(0.26 0.003 106);
+    --sidebar-accent-foreground: oklch(0.955 0.004 106);
+    --sidebar-border: oklch(0.32 0.004 106);
+    --sidebar-ring: oklch(0.955 0.004 106);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
+    scrollbar-color: var(--input) var(--background);
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "tnum" 0;
+    caret-color: var(--foreground);
+  }
+  ::selection {
+    background: var(--tape);
+    color: var(--tape-foreground);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1.5px;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  table, time, [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* The mount lift: opening a photo carries its mount from the table into the
+   dialog. The only orchestrated transition in the app. */
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+/* Keep the square card and the dialog mount inside the moving frame so the
+   old snapshot never spills over the dialog's text mid-lift. */
+::view-transition-group(lifted-mount) {
+  overflow: clip;
+}
+::view-transition-old(lifted-mount),
+::view-transition-new(lifted-mount) {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+/* The square grid card fades out early so it never ghosts over the
+   dialog's text as the frame grows past it. */
+::view-transition-old(lifted-mount) {
+  animation-duration: 120ms;
 }

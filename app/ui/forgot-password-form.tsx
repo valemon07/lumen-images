@@ -1,15 +1,6 @@
 "use client";
 import { useState } from "react";
 import { authClient } from "@/app/lib/auth-client";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -39,22 +30,20 @@ export default function ForgotPasswordForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]"
+      className="mx-auto w-full max-w-sm"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Forgot Password</CardTitle>
-          <CardDescription>
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Forgot password</h1>
+          <p className="text-base text-muted-foreground">
             Enter your email and we&apos;ll send you a link to reset your
             password.
-          </CardDescription>
-          <CardAction>
-            <Link href="/login" className="hover:underline">
+          </p>
+          <Link href="/login" className="text-sm underline decoration-primary decoration-2 underline-offset-4 hover:decoration-foreground">
               Back to login
             </Link>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -67,15 +56,15 @@ export default function ForgotPasswordForm() {
               required
             />
           </div>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
+        </div>
+        <div className="flex flex-col gap-3">
           {message && <p className="text-sm text-muted-foreground">{message}</p>}
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading || !email.trim()}>
-            {loading ? "Sending..." : "Send Reset Link"}
+          <Button type="submit" size="lg" className="w-full" disabled={loading || !email.trim()}>
+            {loading ? "Sending..." : "Send reset link"}
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </form>
   );
 }

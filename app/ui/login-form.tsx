@@ -1,15 +1,6 @@
 "use client";
 import { useActionState } from "react";
 import { authenticate } from "../lib/user-actions";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -21,19 +12,17 @@ export default function LoginForm() {
   return (
     <form
       action={formAction}
-      className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]"
+      className="mx-auto w-full max-w-sm"
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>Log In</CardTitle>
-          <CardDescription>Enter email and password to log in.</CardDescription>
-          <CardAction>
-            <Link href="/signup" className="hover:underline">
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Log in</h1>
+          <p className="text-base text-muted-foreground">Enter email and password to log in.</p>
+          <Link href="/signup" className="text-sm underline decoration-primary decoration-2 underline-offset-4 hover:decoration-foreground">
               Sign up
             </Link>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -64,13 +53,13 @@ export default function LoginForm() {
               />
             </div>
           </div>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full">
-            Login
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button type="submit" size="lg" className="w-full">
+            Log in
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </form>
   );
 }

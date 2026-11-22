@@ -1,5 +1,4 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   UploadIcon,
   Loader2Icon,
@@ -33,7 +32,7 @@ export default function MyDropzone(props: {
     },
     [setFiles],
   );
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       "image/jpeg": [".jpg", ".jpeg"],
@@ -53,18 +52,18 @@ export default function MyDropzone(props: {
           onLoad={() => URL.revokeObjectURL(file.preview)}
           width={50}
           height={50}
-          className={`rounded-md object-cover transition-opacity ${status ? "opacity-50" : ""}`}
+          className={`rounded-none object-cover transition-opacity ${status ? "opacity-50" : ""}`}
         />
         {status && (
           <div className="absolute inset-0 flex items-center justify-center">
             {status === "uploading" && (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
+              <Loader2Icon className="size-4 animate-spin" />
             )}
             {status === "success" && (
-              <CircleCheckIcon className="h-4 w-4 text-emerald-500" />
+              <CircleCheckIcon className="size-4 text-foreground" />
             )}
             {status === "error" && (
-              <OctagonXIcon className="h-4 w-4 text-destructive" />
+              <OctagonXIcon className="size-4 text-destructive" />
             )}
           </div>
         )}
@@ -75,17 +74,21 @@ export default function MyDropzone(props: {
   return (
     <div>
       <div {...getRootProps({ className: "dropzone" })}>
-        <Card className="cursor-pointer my-2">
-          <CardContent className="flex flex-col justify-center items-center gap-y-4">
-            <input {...getInputProps()} />
-            <UploadIcon />
-            <p className="text-center">
-              Drag and drop some files here, or click to select files
-            </p>
-          </CardContent>
-        </Card>
+        <div
+          className={`my-2 flex aspect-[3/2] max-h-80 w-full cursor-pointer flex-col items-center justify-center gap-y-4 border-[1.5px] border-dashed p-6 ${
+            isDragActive
+              ? "border-foreground bg-mount"
+              : "border-input bg-transparent"
+          }`}
+        >
+          <input {...getInputProps()} />
+          <UploadIcon />
+          <p className="text-center">
+            Drop photos here, or click to choose them
+          </p>
+        </div>
       </div>
-      <p>{files.length} file(s) selected</p>
+      <p className="text-sm text-muted-foreground tabular-nums">{files.length === 0 ? "No photos chosen yet." : `${files.length} ${files.length === 1 ? "photo" : "photos"} ready to upload.`}</p>
       <div className="flex flex-row flex-wrap gap-2">{thumbs}</div>
     </div>
   );

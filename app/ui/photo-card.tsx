@@ -8,7 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Photo, Tag } from "../lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,18 @@ import AlbumUploadChooser from "./album-upload-chooser";
 
 const MAX_RETRIES = 3;
 
+// The record Lumen writes on every photo, in the same order and wording the
+// landing page shows on a turned-over mount.
+const READING_ORDER: { category: string; label: string }[] = [
+  { category: "subjects", label: "Subjects" },
+  { category: "setting", label: "Setting" },
+  { category: "timeOfDay", label: "Time of day" },
+  { category: "weather", label: "Weather" },
+  { category: "mood", label: "Mood" },
+  { category: "composition", label: "Composition" },
+  { category: "colorPalette", label: "Palette" },
+];
+
 export default function PhotoCard(props: {
   photoAndUrl: { photo: Photo; url: string };
   onDelete: (photo: Photo) => void;
@@ -55,10 +68,15 @@ export default function PhotoCard(props: {
   const [failed, setFailed] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [tags, setTags] = useState<Tag[] | null>(null);
-  const [tagsLoading, setTagsLoading] = useState(false);
   const [albumId, setAlbumId] = useState<string | null>(photo.album_id ?? null);
   const [albumDialogOpen, setAlbumDialogOpen] = useState(false);
   const attemptsRef = useRef(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const thumbRef = useRef<HTMLImageElement>(null);
+  // The grid image's already-loaded URL, shown in the dialog until the larger
+  // version arrives so the lift never lands on an empty mount.
+  const [thumbSrc, setThumbSrc] = useState<string | null>(null);
+  const [lifting, setLifting] = useState(false);
   const retryingRef = useRef(false);
 
   const handleAnalyze = async () => {
@@ -120,62 +138,128 @@ export default function PhotoCard(props: {
     }
   }, [photo.s3_key]);
 
-  useEffect(() => {
-    if (modalOpen && !tags && !tagsLoading) {
-      const fetchTags = async () => {
-        setTagsLoading(true);
-        try {
-          const photoTags = await getPhotoTags(photo.photo_id);
-          setTags(photoTags);
-        } catch (error) {
-          console.error("Failed to fetch tags:", error);
-        } finally {
-          setTagsLoading(false);
-        }
-      };
-      fetchTags();
+  const tagsRequested = useRef(false);
+  const loadTags = useCallback(async () => {
+    if (tagsRequested.current) return;
+    tagsRequested.current = true;
+    try {
+      const photoTags = await getPhotoTags(photo.photo_id);
+      setTags(photoTags);
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      tagsRequested.current = false;
     }
-  }, [modalOpen, photo.photo_id, tags, tagsLoading]);
+  }, [photo.photo_id]);
+
 
   const imgWidth = photo.width ?? 3;
   const imgHeight = photo.height ?? 2;
   const aspectRatio = imgWidth / imgHeight;
 
+  // Opening a photo lifts its mount off the table into the dialog: the one
+  // orchestrated transition in the app. Falls back to an instant open where
+  // View Transitions are unsupported or reduced motion is requested.
+  // One fixed name: only one element ever holds it at a time (the clicked
+  // card for the old snapshot, the dialog mount for the new one).
+  const mountName = "lifted-mount";
+  const handleOpenChange = (open: boolean) => {
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+    };
+    // Tags usually start loading on pointer down; this covers keyboard opens.
+    if (open && !tags) loadTags();
+    const src = thumbRef.current?.currentSrc || null;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const trigger = triggerRef.current;
+    if (!open || reduce || !doc.startViewTransition || !trigger) {
+      if (open) setThumbSrc(src);
+      setModalOpen(open);
+      return;
+    }
+    // Only the opened card carries the name, and only for the old snapshot;
+    // the dialog mount takes it over for the new one.
+    trigger.style.viewTransitionName = mountName;
+    const transition = doc.startViewTransition(() => {
+      trigger.style.viewTransitionName = "";
+      flushSync(() => {
+        setThumbSrc(src);
+        setLifting(true);
+        setModalOpen(true);
+      });
+    });
+    transition.finished.finally(() => setLifting(false));
+  };
+
+  // Always all seven rows, so the record never changes height as it fills in.
+  const readingRows = READING_ORDER.map(({ category, label }) => ({
+    label,
+    value: (tags ?? [])
+      .filter((t) => t.category === category)
+      .map((t) => t.label)
+      .join(", "),
+  }));
+  const tagsPending = !tags;
+  const notRead = tags !== null && tags.length === 0;
+
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+    <Dialog open={modalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button className="relative w-full overflow-hidden rounded-lg bg-muted text-left cursor-pointer block">
-          <div style={{ paddingBottom: `${(1 / aspectRatio) * 100}%` }} />
+        <button
+          ref={triggerRef}
+          onPointerDown={() => {
+            if (!tags) loadTags();
+          }}
+          className="grid aspect-square w-full cursor-pointer place-items-center bg-mount p-[6%] text-left hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]">
+          <div className="relative size-full">
           {failed ? (
-            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+            <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
               Failed to load
             </div>
           ) : (
             <Image
+              ref={thumbRef}
               src={currentUrl}
               key={currentUrl}
               alt={photo.file_name}
               fill
               quality={85}
-              className={`rounded-lg object-cover transition-opacity duration-300 hover:saturate-75 hover:brightness-125 ${loaded ? "opacity-100" : "opacity-0"}`}
+              className={`object-contain transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               loading="lazy"
               onLoad={() => setLoaded(true)}
               onError={handleError}
             />
           )}
+          </div>
         </button>
       </DialogTrigger>
-      <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto">
+      <DialogContent className="top-[5vh] min-w-fit translate-y-0 sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto data-open:animate-none">
         <div
-          className="relative max-h-[80vh] overflow-hidden rounded-lg"
-          style={{ aspectRatio: `${aspectRatio}` }}
+          // Sized from the photo's own ratio and never squeezed by the dialog's
+          // flex column: full width for landscape, height-capped (and centred)
+          // for portrait, so the photo always sits centred in its mount.
+          className="relative mx-auto shrink-0 overflow-hidden bg-mount"
+          style={{
+            aspectRatio: `${aspectRatio}`,
+            width: `min(100%, calc(62vh * ${aspectRatio}))`,
+            viewTransitionName: lifting ? mountName : undefined,
+          }}
         >
-          {!dialogLoaded && !failed && (
-            <Skeleton className="absolute inset-0 rounded-lg" />
+          {!dialogLoaded && !failed && !thumbSrc && (
+            <Skeleton className="absolute inset-0" />
+          )}
+          <div className="absolute inset-[4%]">
+          {!dialogLoaded && !failed && thumbSrc && (
+            // eslint-disable-next-line @next/next/no-img-element -- the grid's already-decoded image, held until the large one loads
+            <img
+              src={thumbSrc}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 size-full object-contain"
+            />
           )}
           {failed ? (
-            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
               Failed to load
             </div>
           ) : (
@@ -191,22 +275,49 @@ export default function PhotoCard(props: {
               onError={handleError}
             />
           )}
+          </div>
         </div>
         <DialogFooter className="flex flex-col sm:flex-col">
+          <section aria-labelledby={`reading-${photo.photo_id}`} className="w-full">
+            <h2
+              id={`reading-${photo.photo_id}`}
+              className="border-b-[1.5px] border-foreground pb-2 text-base font-bold tracking-tight"
+            >
+              What Lumen read
+            </h2>
+            <dl className="grid grid-cols-[8rem_1fr] text-sm" aria-busy={tagsPending}>
+              {readingRows.map((r) => (
+                <div key={r.label} className="contents">
+                  <dt className="border-b border-border py-2 text-muted-foreground">{r.label}</dt>
+                  <dd className="flex min-h-9 items-center border-b border-border py-2 font-semibold">
+                    {tagsPending ? (
+                      <Skeleton className="h-3.5 w-32" />
+                    ) : r.value ? (
+                      r.value
+                    ) : (
+                      <span className="font-normal text-muted-foreground">
+                        {notRead ? "Not read yet" : "None"}
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
-              <AccordionTrigger>View Metadata...</AccordionTrigger>
+              <AccordionTrigger>File details</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col gap-2">
                   <div>
-                    <strong>File Name:</strong> {photo.file_name}
+                    <strong>File name:</strong> {photo.file_name}
                   </div>
                   <div>
-                    <strong>File Size:</strong>{" "}
-                    {(photo.file_size / 1000000).toFixed(2)} MB
+                    <strong>File size:</strong>{" "}
+                    <span className="tabular-nums">{(photo.file_size / 1000000).toFixed(2)}</span> MB
                   </div>
                   <div>
-                    <strong>File Type:</strong> {photo.file_type}
+                    <strong>File type:</strong> {photo.file_type}
                   </div>
                   <div>
                     <strong>Dimensions:</strong>{" "}
@@ -215,55 +326,24 @@ export default function PhotoCard(props: {
                       : "Unknown"}
                   </div>
                   <div>
-                    <strong>Last Modified:</strong>{" "}
+                    <strong>Last modified:</strong>{" "}
                     {new Date(photo.last_modified || "").toLocaleString()}
                   </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          {tags && tags.length > 0 && (
-            <Accordion type="single" collapsible>
-              <AccordionItem value="tags">
-                <AccordionTrigger>View Tags...</AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-2">
-                    {Object.entries(
-                      tags.reduce(
-                        (acc, tag) => {
-                          acc[tag.category] = [
-                            ...(acc[tag.category] || []),
-                            tag.label,
-                          ];
-                          return acc;
-                        },
-                        {} as Record<string, string[]>,
-                      ),
-                    ).map(([category, labels]) => (
-                      <div key={category}>
-                        <strong>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                          :
-                        </strong>{" "}
-                        {labels.join(", ")}
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          )}
           <div className="flex flex-row items-start gap-2 self-start">
             <Dialog open={albumDialogOpen} onOpenChange={setAlbumDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <FolderIcon className="mr-2 h-4 w-4" />
-                  {albumId ? "Album" : "Add to Album"}
+                  {albumId ? "Album" : "Add to album"}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Select Album</DialogTitle>
+                  <DialogTitle>Choose album</DialogTitle>
                 </DialogHeader>
                 <AlbumUploadChooser
                   selectedAlbumId={albumId}
@@ -271,7 +351,7 @@ export default function PhotoCard(props: {
                 />
               </DialogContent>
             </Dialog>
-            {(!tags || tags.length === 0) && (
+            {notRead && (
               <Button
                 variant="outline"
                 onClick={handleAnalyze}
@@ -287,35 +367,38 @@ export default function PhotoCard(props: {
             )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant={"destructive"}>Delete</Button>
+                <Button
+                  variant="outline"
+                  className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  Delete
+                </Button>
               </AlertDialogTrigger>
               <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                  <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                  <AlertDialogMedia className="rounded-none bg-transparent text-destructive">
                     <Trash2Icon />
                   </AlertDialogMedia>
-                  <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete this photo?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete the image. Double check
-                    you&apos;re deleting the right image!
+                    This removes the photo and everything Lumen read in it.
+                    It can&apos;t be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel variant={"outline"}>
                     Cancel
                   </AlertDialogCancel>
-                  <AlertDialogAction asChild>
-                    <Button
-                      variant={"destructive"}
-                      onClick={() => {
-                        if (photo) {
-                          onDelete(photo);
-                        }
-                        setModalOpen(false);
-                      }}
-                    >
-                      Delete
-                    </Button>
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={() => {
+                      if (photo) {
+                        onDelete(photo);
+                      }
+                      setModalOpen(false);
+                    }}
+                  >
+                    Delete photo
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

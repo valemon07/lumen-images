@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Hanken_Grotesk, Kalam } from "next/font/google";
 import "./ui/globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const hanken = Hanken_Grotesk({
+  variable: "--font-sans",
+  subsets: ["latin"],
+});
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Only used for the yellow tape labels that group photos.
+const kalam = Kalam({
+  variable: "--font-kalam",
+  weight: "700",
   subsets: ["latin"],
 });
 
@@ -18,7 +23,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Lumen",
-  description: "A photo collection app",
+  description:
+    "Lay out your photos and Lumen reads them: subjects, setting, mood and composition, grouped across your whole collection.",
 };
 
 export default function RootLayout({
@@ -33,10 +39,10 @@ export default function RootLayout({
       className={cn(
         "h-full",
         "antialiased",
-        geistSans.variable,
+        hanken.variable,
+        kalam.variable,
         geistMono.variable,
         "font-sans",
-        inter.variable,
       )}
     >
       <head></head>
