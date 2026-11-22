@@ -16,12 +16,13 @@ function hasPhoto(file: string) {
 export default function PhotoSlot({
   photo,
   sizes,
-  priority = false,
+  eager = false,
   className,
 }: {
   photo: SamplePhoto;
   sizes: string;
-  priority?: boolean;
+  /** Above the fold: load immediately instead of lazily. */
+  eager?: boolean;
   className?: string;
 }) {
   // Inside a square mount: landscape fills the width, portrait the height.
@@ -38,7 +39,7 @@ export default function PhotoSlot({
           alt={photo.alt}
           fill
           sizes={sizes}
-          priority={priority}
+          loading={eager ? "eager" : "lazy"}
           className="object-cover"
         />
       </div>

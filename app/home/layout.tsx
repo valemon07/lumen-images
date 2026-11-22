@@ -15,9 +15,9 @@ export default function HomeLayout({
     <AlbumsProvider>
       <SidebarProvider>
         <SidebarNav />
-        <SidebarInset>
-          <main className="relative flex grow pt-14 md:pt-0">
-            <SidebarTrigger className="absolute my-4" />
+        <SidebarInset className="min-w-0 overflow-x-clip">
+          <main className="relative flex min-w-0 grow pt-14 lg:pt-0">
+            <SidebarTrigger className="absolute top-3 left-2 z-10" />
             {children}
           </main>
         </SidebarInset>

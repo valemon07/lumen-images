@@ -84,11 +84,11 @@ export default function MyDropzone(props: {
           <input {...getInputProps()} />
           <UploadIcon />
           <p className="text-center">
-            Drag and drop some files here, or click to select files
+            Drop photos here, or click to choose them
           </p>
         </div>
       </div>
-      <p className="text-sm text-muted-foreground tabular-nums">{files.length} file(s) selected</p>
+      <p className="text-sm text-muted-foreground tabular-nums">{files.length === 0 ? "No photos chosen yet." : `${files.length} ${files.length === 1 ? "photo" : "photos"} ready to upload.`}</p>
       <div className="flex flex-row flex-wrap gap-2">{thumbs}</div>
     </div>
   );

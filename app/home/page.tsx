@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCurrentUserPhotos, getUserInsights } from "@/app/lib/actions";
+import MountImage from "@/app/ui/mount-image";
 
 const RECENT = 8;
 
@@ -93,15 +93,7 @@ export default async function Page() {
                   aria-label={`${photo.file_name}, open photos`}
                   className="grid aspect-square place-items-center bg-mount p-[9%] transition-colors hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]"
                 >
-                  <span className="relative block size-full">
-                    <Image
-                      src={url}
-                      alt={photo.file_name}
-                      fill
-                      sizes="15rem"
-                      className="object-contain"
-                    />
-                  </span>
+                  <MountImage src={url} alt={photo.file_name} sizes="15rem" />
                 </Link>
               </li>
             ))}

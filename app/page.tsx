@@ -23,6 +23,19 @@ function sharedGroups(photos: SamplePhoto[], limit = 2) {
     .slice(0, limit);
 }
 
+// A label two neighbouring photos share, so a tape can group them on the table.
+function sharedLabel(a: SamplePhoto, b?: SamplePhoto) {
+  if (!b) return null;
+  const labels = (p: SamplePhoto) => [
+    p.reading.timeOfDay,
+    p.reading.weather,
+    p.reading.colorPalette,
+    ...p.reading.composition,
+  ];
+  const theirs = new Set(labels(b));
+  return labels(a).find((l) => l !== "unknown" && theirs.has(l)) ?? null;
+}
+
 function Tape({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <span
@@ -55,7 +68,7 @@ export default function Home() {
 
       <main className="flex-1">
         {/* First viewport: a compact headline band, then the table of photos. */}
-        <section className="px-4 pt-6 pb-12 sm:px-8 lg:px-16 lg:pt-8">
+        <section className="px-4 pt-6 pb-8 sm:px-8 lg:px-16 lg:pt-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <h1 className="max-w-[13ch] text-[2.75rem] leading-[0.95] font-black tracking-[-0.04em] sm:text-6xl lg:text-7xl">
               Lay out your photos. Lumen reads them.
@@ -78,27 +91,28 @@ export default function Home() {
 
         <section aria-label="Sample photos with Lumen's readings" className="relative">
           <div className="flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 sm:scroll-px-8 lg:scroll-px-16 pt-6 pb-10 sm:px-8 lg:gap-6 lg:px-16 [scrollbar-width:thin]">
-            {samplePhotos.map((p, i) => (
-              <div key={p.file} className="relative w-[15rem] shrink-0 snap-start sm:w-[18rem] lg:w-[20rem]">
-                {i === 0 && (
-                  <Tape className="absolute -top-5 left-4 z-10 -rotate-2">
-                    {p.reading.weather}
-                  </Tape>
-                )}
-                {i === 2 && (
-                  <Tape className="absolute -top-5 left-6 z-10 rotate-1">
-                    {p.reading.timeOfDay}
+            {samplePhotos.map((p, i) => {
+              // Tape the first two pairs together by a label they share.
+              const group = i % 2 === 0 && i < 4 ? sharedLabel(p, samplePhotos[i + 1]) : null;
+              return (
+              <div key={p.file} className="relative w-[15rem] shrink-0 snap-start sm:w-[18rem] lg:w-[21rem]">
+                {group && (
+                  <Tape
+                    className={`absolute -top-5 -right-14 z-10 whitespace-nowrap sm:-right-16 ${i === 0 ? "-rotate-2" : "rotate-1"}`}
+                  >
+                    {group}
                   </Tape>
                 )}
                 <Mount label={p.alt} rows={readingRows(p.reading)}>
                   <PhotoSlot
                     photo={p}
-                    priority={i < 3}
+                    eager={i < 3}
                     sizes="(min-width: 1024px) 20rem, (min-width: 640px) 18rem, 15rem"
                   />
                 </Mount>
               </div>
-            ))}
+              );
+            })}
           </div>
           <p className="px-4 text-sm text-muted-foreground sm:px-8 lg:px-16">
             Hover or tap a photo to turn it over.

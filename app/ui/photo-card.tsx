@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Photo, Tag } from "../lib/types";
 
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,18 @@ import {
 import AlbumUploadChooser from "./album-upload-chooser";
 
 const MAX_RETRIES = 3;
+
+// The record Lumen writes on every photo, in the same order and wording the
+// landing page shows on a turned-over mount.
+const READING_ORDER: { category: string; label: string }[] = [
+  { category: "subjects", label: "Subjects" },
+  { category: "setting", label: "Setting" },
+  { category: "timeOfDay", label: "Time of day" },
+  { category: "weather", label: "Weather" },
+  { category: "mood", label: "Mood" },
+  { category: "composition", label: "Composition" },
+  { category: "colorPalette", label: "Palette" },
+];
 
 export default function PhotoCard(props: {
   photoAndUrl: { photo: Photo; url: string };
@@ -141,10 +154,38 @@ export default function PhotoCard(props: {
   const imgHeight = photo.height ?? 2;
   const aspectRatio = imgWidth / imgHeight;
 
+  // Opening a photo lifts its mount off the table into the dialog: the one
+  // orchestrated transition in the app. Falls back to an instant open where
+  // View Transitions are unsupported or reduced motion is requested.
+  const mountName = `mount-${photo.photo_id}`;
+  const handleOpenChange = (open: boolean) => {
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => unknown;
+    };
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!open || reduce || !doc.startViewTransition) {
+      setModalOpen(open);
+      return;
+    }
+    doc.startViewTransition(() => flushSync(() => setModalOpen(true)));
+  };
+
+  const readingRows = tags
+    ? READING_ORDER.map(({ category, label }) => ({
+        label,
+        value: tags
+          .filter((t) => t.category === category)
+          .map((t) => t.label)
+          .join(", "),
+      })).filter((r) => r.value)
+    : [];
+
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+    <Dialog open={modalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button className="grid aspect-square w-full cursor-pointer place-items-center bg-mount p-[6%] text-left hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]">
+        <button
+          style={{ viewTransitionName: modalOpen ? undefined : mountName }}
+          className="grid aspect-square w-full cursor-pointer place-items-center bg-mount p-[6%] text-left hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]">
           <div className="relative size-full">
           {failed ? (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
@@ -167,10 +208,10 @@ export default function PhotoCard(props: {
           </div>
         </button>
       </DialogTrigger>
-      <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto">
+      <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto data-open:animate-none">
         <div
           className="relative max-h-[80vh] overflow-hidden bg-mount p-[4%]"
-          style={{ aspectRatio: `${aspectRatio}` }}
+          style={{ aspectRatio: `${aspectRatio}`, viewTransitionName: mountName }}
         >
           {!dialogLoaded && !failed && (
             <Skeleton className="absolute inset-0" />
@@ -196,20 +237,48 @@ export default function PhotoCard(props: {
           </div>
         </div>
         <DialogFooter className="flex flex-col sm:flex-col">
+          <section aria-labelledby={`reading-${photo.photo_id}`} className="w-full">
+            <h2
+              id={`reading-${photo.photo_id}`}
+              className="border-b-[1.5px] border-foreground pb-2 text-base font-bold tracking-tight"
+            >
+              What Lumen read
+            </h2>
+            {tagsLoading || (!tags && modalOpen) ? (
+              <div className="mt-3 flex flex-col gap-2" aria-busy="true">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-3/5" />
+              </div>
+            ) : readingRows.length > 0 ? (
+              <dl className="grid grid-cols-[8rem_1fr] text-sm">
+                {readingRows.map((r) => (
+                  <div key={r.label} className="contents">
+                    <dt className="border-b border-border py-2 text-muted-foreground">{r.label}</dt>
+                    <dd className="border-b border-border py-2 font-semibold">{r.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">
+                Lumen hasn&apos;t read this photo yet. Choose Analyze below.
+              </p>
+            )}
+          </section>
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
               <AccordionTrigger>File details</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col gap-2">
                   <div>
-                    <strong>File Name:</strong> {photo.file_name}
+                    <strong>File name:</strong> {photo.file_name}
                   </div>
                   <div>
-                    <strong>File Size:</strong>{" "}
+                    <strong>File size:</strong>{" "}
                     <span className="tabular-nums">{(photo.file_size / 1000000).toFixed(2)}</span> MB
                   </div>
                   <div>
-                    <strong>File Type:</strong> {photo.file_type}
+                    <strong>File type:</strong> {photo.file_type}
                   </div>
                   <div>
                     <strong>Dimensions:</strong>{" "}
@@ -218,58 +287,19 @@ export default function PhotoCard(props: {
                       : "Unknown"}
                   </div>
                   <div>
-                    <strong>Last Modified:</strong>{" "}
+                    <strong>Last modified:</strong>{" "}
                     {new Date(photo.last_modified || "").toLocaleString()}
                   </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          {tags && tags.length > 0 && (
-            <Accordion type="single" collapsible>
-              <AccordionItem value="tags">
-                <AccordionTrigger>What Lumen read</AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-3">
-                    {Object.entries(
-                      tags.reduce(
-                        (acc, tag) => {
-                          acc[tag.category] = [
-                            ...(acc[tag.category] || []),
-                            tag.label,
-                          ];
-                          return acc;
-                        },
-                        {} as Record<string, string[]>,
-                      ),
-                    ).map(([category, labels]) => (
-                      <div key={category} className="flex flex-col gap-1.5">
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {labels.map((label) => (
-                            <span
-                              key={label}
-                              className="inline-flex items-center border border-border px-2 py-0.5 text-sm"
-                            >
-                              {label}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          )}
           <div className="flex flex-row items-start gap-2 self-start">
             <Dialog open={albumDialogOpen} onOpenChange={setAlbumDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <FolderIcon className="mr-2 h-4 w-4" />
-                  {albumId ? "Album" : "Add to Album"}
+                  {albumId ? "Album" : "Add to album"}
                 </Button>
               </DialogTrigger>
               <DialogContent>

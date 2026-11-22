@@ -164,3 +164,14 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/* The mount lift: opening a photo carries its mount from the table into the
+   dialog. The only orchestrated transition in the app. */
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}

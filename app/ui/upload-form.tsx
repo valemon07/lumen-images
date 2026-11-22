@@ -139,9 +139,9 @@ export default function UploadForm({
           setFiles={handleFilesChange}
           statuses={statuses}
         />
-        <Button onClick={handleUpload} disabled={uploading}>
+        <Button onClick={handleUpload} disabled={uploading || files.length === 0}>
           {uploading && <Loader2Icon className="mr-2 size-4 animate-spin" />}
-          {uploading ? "Uploading..." : "Upload photos"}
+          {uploading ? "Uploading…" : files.length > 1 ? `Upload ${files.length} photos` : "Upload photo"}
         </Button>
       </div>
     </div>

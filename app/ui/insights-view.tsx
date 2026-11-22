@@ -26,7 +26,7 @@ function BreakdownCard({
             </div>
             <div className="h-2 w-full rounded-none bg-muted">
               <div
-                className={cn("h-full rounded-none bg-primary")}
+                className={cn("h-full rounded-none bg-foreground")}
                 style={{
                   width: `${Math.max(stat.percentage, stat.count > 0 ? 2 : 0)}%`,
                 }}
@@ -49,7 +49,10 @@ function RankedListCard({
   title: string;
   items: { label: string; count: number }[];
 }) {
-  const maxCount = items.length > 0 ? items[0].count : 0;
+  const counts = items.map((i) => Number(i.count));
+  const maxCount = counts.length > 0 ? Math.max(...counts) : 0;
+  // When every count is the same there is no ranking to show: list them as ties.
+  const allTied = counts.length > 1 && counts.every((c) => c === counts[0]);
   return (
     <section className="flex flex-col gap-4 border-t border-border pt-4">
       <h2 className="flex items-center gap-2">
@@ -57,6 +60,20 @@ function RankedListCard({
           {title}
         </span>
       </h2>
+      {allTied ? (
+        <div className="flex flex-col gap-3">
+          <ul className="flex flex-wrap gap-1.5">
+            {items.map((item) => (
+              <li key={item.label} className="border border-border px-2 py-0.5 text-sm">
+                {item.label}
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm text-muted-foreground tabular-nums">
+            {counts[0]} {counts[0] === 1 ? "photo" : "photos"} each, no clear favorite yet.
+          </p>
+        </div>
+      ) : (
       <div className="space-y-3">
         {items.map((item, index) => (
           <div key={item.label} className="space-y-1">
@@ -71,7 +88,7 @@ function RankedListCard({
             </div>
             <div className="h-2 w-full rounded-none bg-muted">
               <div
-                className="h-full rounded-none bg-primary"
+                className="h-full rounded-none bg-foreground"
                 style={{
                   width: `${maxCount > 0 ? Math.max((item.count / maxCount) * 100, 2) : 0}%`,
                 }}
@@ -83,6 +100,7 @@ function RankedListCard({
           <p className="text-sm text-muted-foreground">No data yet.</p>
         )}
       </div>
+      )}
     </section>
   );
 }
