@@ -163,7 +163,9 @@ export default function PhotoCard(props: {
   // Opening a photo lifts its mount off the table into the dialog: the one
   // orchestrated transition in the app. Falls back to an instant open where
   // View Transitions are unsupported or reduced motion is requested.
-  const mountName = `mount-${photo.photo_id}`;
+  // One fixed name: only one element ever holds it at a time (the clicked
+  // card for the old snapshot, the dialog mount for the new one).
+  const mountName = "lifted-mount";
   const handleOpenChange = (open: boolean) => {
     const doc = document as Document & {
       startViewTransition?: (cb: () => void) => { finished: Promise<void> };

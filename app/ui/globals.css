@@ -175,3 +175,19 @@
 ::view-transition-new(root) {
   animation-duration: 180ms;
 }
+/* Keep the square card and the dialog mount inside the moving frame so the
+   old snapshot never spills over the dialog's text mid-lift. */
+::view-transition-group(lifted-mount) {
+  overflow: clip;
+}
+::view-transition-old(lifted-mount),
+::view-transition-new(lifted-mount) {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+/* The square grid card fades out early so it never ghosts over the
+   dialog's text as the frame grows past it. */
+::view-transition-old(lifted-mount) {
+  animation-duration: 120ms;
+}
