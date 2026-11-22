@@ -85,9 +85,9 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 py-2 px-4">
+    <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <FilterIcon className="h-4 w-4" />
+        <FilterIcon className="size-4" />
         <span>Filters</span>
       </div>
 
@@ -138,7 +138,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1">
               {CATEGORY_LABELS[category]}
-              <ChevronDownIcon className="h-3 w-3" />
+              <ChevronDownIcon className="size-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="min-w-50">
@@ -171,7 +171,7 @@ export default function FilterBar({ filters, onChange }: FilterBarProps) {
             onClick={handleClearAll}
             className="gap-1 text-destructive hover:text-destructive"
           >
-            <XIcon className="h-3 w-3" />
+            <XIcon className="size-3" />
             Clear ({activeFilterCount})
           </Button>
         </>

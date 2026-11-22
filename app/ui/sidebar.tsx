@@ -14,7 +14,6 @@ import AccountMenu from "./accounts-menu";
 import Link from "next/link";
 import {
   Album,
-  Home,
   Image as ImageIcon,
   Sparkles,
   Upload,
@@ -23,17 +22,12 @@ import {
 export function SidebarNav() {
   return (
     <Sidebar variant="inset">
-      <SidebarHeader className="flex justify-center items-center rounded-lg">
+      <SidebarHeader className="px-4 py-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/home">
-                <div className="flex aspect-square size-8 rounded-lg items-center justify-center bg-primary">
-                  <Home className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium">Lumen Images</span>
-                </div>
+                <span className="text-xl font-black tracking-tight">Lumen</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -41,17 +35,13 @@ export function SidebarNav() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground">Main</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="default" asChild>
                 <Link href="/home/photos">
-                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
-                    <ImageIcon className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span>Photos</span>
-                  </div>
+                  <ImageIcon className="size-4" />
+                  <span className="text-sm font-medium">Photos</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -60,12 +50,8 @@ export function SidebarNav() {
             <SidebarMenuItem>
               <SidebarMenuButton size="default" asChild>
                 <Link href="/home/albums">
-                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
-                    <Album className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span>Albums</span>
-                  </div>
+                  <Album className="size-4" />
+                  <span className="text-sm font-medium">Albums</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -74,29 +60,21 @@ export function SidebarNav() {
             <SidebarMenuItem>
               <SidebarMenuButton size="default" asChild>
                 <Link href="/home/insights">
-                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
-                    <Sparkles className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span>Insights</span>
-                  </div>
+                  <Sparkles className="size-4" />
+                  <span className="text-sm font-medium">Insights</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Other</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground">Other</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="default" asChild>
                 <Link href="/home/upload">
-                  <div className="flex aspect-square size-8 rounded-lg items-center justify-center">
-                    <Upload className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span>Upload</span>
-                  </div>
+                  <Upload className="size-4" />
+                  <span className="text-sm font-medium">Upload</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -17,12 +17,12 @@ export function SkeletonCard() {
 }
 
 export function SkeletonImage() {
-  return <Skeleton className="aspect-square max-w-3xs rounded-xl" />;
+  return <Skeleton className="aspect-square w-full" />;
 }
 
 export function SkeletonFilterBar() {
   return (
-    <div className="flex flex-wrap items-center gap-3 py-2 px-4">
+    <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-2">
         <Skeleton className="size-4" />
         <Skeleton className="h-4 w-12" />

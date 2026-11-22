@@ -70,15 +70,15 @@ export default function AccountMenu() {
             <DropdownMenuSubContent>
               <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
                 <DropdownMenuRadioItem value="light">
-                  <Sun className="mr-2 h-4 w-4" />
+                  <Sun className="mr-2 size-4" />
                   Light
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="dark">
-                  <Moon className="mr-2 h-4 w-4" />
+                  <Moon className="mr-2 size-4" />
                   Dark
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="system">
-                  <Monitor className="mr-2 h-4 w-4" />
+                  <Monitor className="mr-2 size-4" />
                   System
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>

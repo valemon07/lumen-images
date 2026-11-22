@@ -34,7 +34,7 @@ function Tape({ children, className }: { children: React.ReactNode; className?: 
 }
 
 export default function Home() {
-  const [lead, ...rest] = samplePhotos;
+  const lead = samplePhotos[0];
   const groups = sharedGroups(samplePhotos);
 
   return (

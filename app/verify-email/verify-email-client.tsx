@@ -6,14 +6,6 @@ import { authClient } from "@/app/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export default function VerifyEmailClient() {
   const searchParams = useSearchParams();
@@ -62,9 +54,9 @@ export default function VerifyEmailClient() {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-sm [--card-spacing:--spacing(8)]">
-      <CardHeader>
-        <CardTitle>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">
           {status === "verified"
             ? "Email Verified"
             : status === "error"
@@ -72,8 +64,8 @@ export default function VerifyEmailClient() {
               : token
                 ? "Verifying..."
                 : "Check Your Email"}
-        </CardTitle>
-        <CardDescription>
+        </h1>
+        <p className="text-base text-muted-foreground">
           {status === "verified"
             ? "Your email has been verified. Redirecting..."
             : status === "error"
@@ -81,11 +73,11 @@ export default function VerifyEmailClient() {
               : token
                 ? "Verifying your email address..."
                 : "We sent you a verification link. Check your inbox to activate your account."}
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
 
       {(status === "idle" || status === "error") && (
-        <CardContent>
+        <div>
           {status === "error" && !token && (
             <p className="mb-4 text-sm text-destructive">{error}</p>
           )}
@@ -102,24 +94,24 @@ export default function VerifyEmailClient() {
                 required
               />
             </div>
-            <Button type="submit" disabled={resending || !email.trim()}>
+            <Button type="submit" size="lg" className="w-full" disabled={resending || !email.trim()}>
               {resending ? "Sending..." : "Resend Verification Email"}
             </Button>
           </form>
-        </CardContent>
+        </div>
       )}
 
-      <CardFooter className="flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {token ? (
-          <Button asChild variant="outline" className="w-full">
+          <Button asChild variant="outline" size="lg" className="w-full">
             <Link href={callbackURL}>Continue to app</Link>
           </Button>
         ) : (
-          <Button asChild variant="outline" className="w-full">
+          <Button asChild variant="outline" size="lg" className="w-full">
             <Link href="/login">Go to login</Link>
           </Button>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

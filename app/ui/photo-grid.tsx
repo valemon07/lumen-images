@@ -76,9 +76,10 @@ export default function PhotoGrid(props: {
       currentFilters.date.type !== "all" ||
       Object.values(currentFilters.tags).some((labels) => labels.length > 0);
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center w-full">
+      <div className="grid aspect-[3/2] w-full place-items-center border-[1.5px] border-dashed border-input bg-transparent p-6 text-center">
+        <div className="flex flex-col items-center">
         <p className="text-muted-foreground">
-          {hasActiveFilters ? "No images match your filters" : "No images found!"}
+          {hasActiveFilters ? "No photos match these filters. Clear them to see everything." : "No photos on the table yet. Upload your first ones."}
         </p>
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters} className="mt-2 gap-1">
@@ -86,6 +87,7 @@ export default function PhotoGrid(props: {
             Clear filters
           </Button>
         )}
+        </div>
       </div>
     );
   }
@@ -94,13 +96,13 @@ export default function PhotoGrid(props: {
   const count = visibleItems.length;
   const cols =
     count <= 3
-      ? "columns-1 sm:columns-2 md:columns-3"
+      ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
       : count <= 8
-        ? "columns-2 sm:columns-3 md:columns-4"
-        : "columns-2 sm:columns-3 md:columns-4 lg:columns-5";
+        ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
+        : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5";
 
   return (
-    <div className={`w-full ${cols} gap-4 *:break-inside-avoid *:mb-4`}>
+    <div className={`w-full ${cols} gap-4`}>
       {visibleItems.map(({ photo, url }) => (
         <PhotoCard
           photoAndUrl={{ photo, url }}

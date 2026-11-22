@@ -16,7 +16,7 @@ export default function HomeLayout({
       <SidebarProvider>
         <SidebarNav />
         <SidebarInset>
-          <main className="flex grow">
+          <main className="relative flex grow pt-14 md:pt-0">
             <SidebarTrigger className="absolute my-4" />
             {children}
           </main>

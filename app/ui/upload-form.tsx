@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import MyDropzone, { type PreviewFile, type UploadStatus } from "./dropzone";
@@ -118,10 +117,12 @@ export default function UploadForm({
   }
 
   return (
-    <div className="flex flex-col mx-4 my-4 gap-x-4 gap-y-8">
+    <div className="flex flex-col gap-x-4 gap-y-6">
       <div className="w-full max-w-sm">
-        <CardTitle>Upload Images</CardTitle>
-        <CardDescription>Max size: 20MB</CardDescription>
+        <h2 className="text-xl font-bold tracking-tight">Upload Images</h2>
+        <p className="text-sm text-muted-foreground">
+          Max size: <span className="tabular-nums">20MB</span>
+        </p>
       </div>
       <div className="flex flex-col gap-4">
         <div className="w-full max-w-sm">
@@ -139,7 +140,7 @@ export default function UploadForm({
           statuses={statuses}
         />
         <Button onClick={handleUpload} disabled={uploading}>
-          {uploading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+          {uploading && <Loader2Icon className="mr-2 size-4 animate-spin" />}
           {uploading ? "Uploading..." : "Upload Images"}
         </Button>
       </div>

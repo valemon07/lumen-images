@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Building2,
   Camera,
@@ -25,18 +24,16 @@ function StatCard({
   sublabel?: string;
 }) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{label}</CardTitle>
+    <div className="flex flex-col gap-2 border border-border p-5">
+      <div className="flex items-center justify-between">
+        <span className="text-base font-bold tracking-tight">{label}</span>
         <Icon className="size-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-semibold">{value}</div>
-        {sublabel && (
-          <div className="mt-1 text-xs text-muted-foreground">{sublabel}</div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+      <div className="text-3xl font-black tracking-[-0.035em] tabular-nums">{value}</div>
+      {sublabel && (
+        <div className="text-xs text-muted-foreground tabular-nums">{sublabel}</div>
+      )}
+    </div>
   );
 }
 
@@ -50,25 +47,25 @@ function BreakdownCard({
   stats: CategoryStat[];
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Icon className="size-4 text-muted-foreground" />
+    <section className="flex flex-col gap-4 border-t border-border pt-4">
+      <h2 className="flex items-center gap-2">
+        <span className="inline-flex items-center gap-2 -rotate-1 bg-tape px-2.5 py-0.5 font-tape text-base leading-snug text-tape-foreground">
+          <Icon className="size-4" />
           {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </span>
+      </h2>
+      <div className="space-y-3">
         {stats.map((stat) => (
           <div key={stat.label} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <span className="capitalize">{stat.label}</span>
-              <span className="text-muted-foreground">
+              <span className="text-right text-muted-foreground tabular-nums">
                 {stat.count} · {stat.percentage}%
               </span>
             </div>
-            <div className="h-2 w-full rounded-full bg-muted">
+            <div className="h-2 w-full rounded-none bg-muted">
               <div
-                className={cn("h-full rounded-full bg-primary")}
+                className={cn("h-full rounded-none bg-primary")}
                 style={{
                   width: `${Math.max(stat.percentage, stat.count > 0 ? 2 : 0)}%`,
                 }}
@@ -79,8 +76,8 @@ function BreakdownCard({
         {stats.length === 0 && (
           <p className="text-sm text-muted-foreground">No data yet.</p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 
@@ -95,28 +92,28 @@ function RankedListCard({
 }) {
   const maxCount = items.length > 0 ? items[0].count : 0;
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Icon className="size-4 text-muted-foreground" />
+    <section className="flex flex-col gap-4 border-t border-border pt-4">
+      <h2 className="flex items-center gap-2">
+        <span className="inline-flex items-center gap-2 -rotate-1 bg-tape px-2.5 py-0.5 font-tape text-base leading-snug text-tape-foreground">
+          <Icon className="size-4" />
           {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </span>
+      </h2>
+      <div className="space-y-3">
         {items.map((item, index) => (
           <div key={item.label} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-2">
-                <span className="w-4 text-right text-xs text-muted-foreground">
+                <span className="w-4 text-right text-xs text-muted-foreground tabular-nums">
                   {index + 1}
                 </span>
                 <span className="capitalize">{item.label}</span>
               </span>
-              <span className="text-muted-foreground">{item.count}</span>
+              <span className="text-right text-muted-foreground tabular-nums">{item.count}</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-muted">
+            <div className="h-2 w-full rounded-none bg-muted">
               <div
-                className="h-full rounded-full bg-primary"
+                className="h-full rounded-none bg-primary"
                 style={{
                   width: `${maxCount > 0 ? Math.max((item.count / maxCount) * 100, 2) : 0}%`,
                 }}
@@ -127,8 +124,8 @@ function RankedListCard({
         {items.length === 0 && (
           <p className="text-sm text-muted-foreground">No data yet.</p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 
@@ -139,7 +136,7 @@ export default function InsightsView({ data }: { data: InsightsData }) {
     totalPhotos > 0 ? Math.round((taggedPhotos / totalPhotos) * 100) : 0;
 
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-8 w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={Camera}
@@ -170,7 +167,7 @@ export default function InsightsView({ data }: { data: InsightsData }) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
         <BreakdownCard
           icon={Building2}
           title="Setting"
@@ -198,7 +195,7 @@ export default function InsightsView({ data }: { data: InsightsData }) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
         <RankedListCard icon={Tags} title="Top Subjects" items={topSubjects} />
         <RankedListCard icon={Heart} title="Top Moods" items={topMoods} />
       </div>

@@ -144,10 +144,10 @@ export default function PhotoCard(props: {
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger asChild>
-        <button className="relative w-full overflow-hidden rounded-lg bg-muted text-left cursor-pointer block">
-          <div style={{ paddingBottom: `${(1 / aspectRatio) * 100}%` }} />
+        <button className="grid aspect-square w-full cursor-pointer place-items-center bg-mount p-[6%] text-left hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]">
+          <div className="relative size-full">
           {failed ? (
-            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+            <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
               Failed to load
             </div>
           ) : (
@@ -157,25 +157,27 @@ export default function PhotoCard(props: {
               alt={photo.file_name}
               fill
               quality={85}
-              className={`rounded-lg object-cover transition-opacity duration-300 hover:saturate-75 hover:brightness-125 ${loaded ? "opacity-100" : "opacity-0"}`}
+              className={`object-contain transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               loading="lazy"
               onLoad={() => setLoaded(true)}
               onError={handleError}
             />
           )}
+          </div>
         </button>
       </DialogTrigger>
       <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto">
         <div
-          className="relative max-h-[80vh] overflow-hidden rounded-lg"
+          className="relative max-h-[80vh] overflow-hidden bg-mount p-[4%]"
           style={{ aspectRatio: `${aspectRatio}` }}
         >
           {!dialogLoaded && !failed && (
-            <Skeleton className="absolute inset-0 rounded-lg" />
+            <Skeleton className="absolute inset-0" />
           )}
+          <div className="absolute inset-[4%]">
           {failed ? (
-            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
               Failed to load
             </div>
           ) : (
@@ -191,6 +193,7 @@ export default function PhotoCard(props: {
               onError={handleError}
             />
           )}
+          </div>
         </div>
         <DialogFooter className="flex flex-col sm:flex-col">
           <Accordion type="single" collapsible>
@@ -203,7 +206,7 @@ export default function PhotoCard(props: {
                   </div>
                   <div>
                     <strong>File Size:</strong>{" "}
-                    {(photo.file_size / 1000000).toFixed(2)} MB
+                    <span className="tabular-nums">{(photo.file_size / 1000000).toFixed(2)}</span> MB
                   </div>
                   <div>
                     <strong>File Type:</strong> {photo.file_type}
@@ -227,7 +230,7 @@ export default function PhotoCard(props: {
               <AccordionItem value="tags">
                 <AccordionTrigger>View Tags...</AccordionTrigger>
                 <AccordionContent>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {Object.entries(
                       tags.reduce(
                         (acc, tag) => {
@@ -240,12 +243,20 @@ export default function PhotoCard(props: {
                         {} as Record<string, string[]>,
                       ),
                     ).map(([category, labels]) => (
-                      <div key={category}>
-                        <strong>
+                      <div key={category} className="flex flex-col gap-1.5">
+                        <span className="text-xs font-semibold text-muted-foreground">
                           {category.charAt(0).toUpperCase() + category.slice(1)}
-                          :
-                        </strong>{" "}
-                        {labels.join(", ")}
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {labels.map((label) => (
+                            <span
+                              key={label}
+                              className="inline-flex items-center border border-border px-2 py-0.5 text-sm"
+                            >
+                              {label}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -291,7 +302,7 @@ export default function PhotoCard(props: {
               </AlertDialogTrigger>
               <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                  <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                  <AlertDialogMedia className="rounded-none bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
                     <Trash2Icon />
                   </AlertDialogMedia>
                   <AlertDialogTitle>Delete Image?</AlertDialogTitle>

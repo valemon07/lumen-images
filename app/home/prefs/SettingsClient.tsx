@@ -17,7 +17,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Separator } from "@/components/ui/separator";
 
 function NameForm({
   onSubmit,
@@ -244,33 +243,27 @@ export default function SettingsClient() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl mx-8 p-8">
-      <section>
-        <h2 className="text-lg font-medium mb-4">Profile</h2>
+    <div className="max-w-2xl space-y-8">
+      <section className="border-t border-border pt-8 first:border-t-0 first:pt-0">
+        <h2 className="mb-4 text-xl font-bold tracking-tight">Profile</h2>
         <NameForm onSubmit={handleNameUpdate} loading={loading === "name"} />
       </section>
 
-      <Separator />
-
-      <section>
-        <h2 className="text-lg font-medium mb-4">Email</h2>
+      <section className="border-t border-border pt-8 first:border-t-0 first:pt-0">
+        <h2 className="mb-4 text-xl font-bold tracking-tight">Email</h2>
         <EmailForm onSubmit={handleEmailChange} loading={loading === "email"} />
       </section>
 
-      <Separator />
-
-      <section>
-        <h2 className="text-lg font-medium mb-4">Password</h2>
+      <section className="border-t border-border pt-8 first:border-t-0 first:pt-0">
+        <h2 className="mb-4 text-xl font-bold tracking-tight">Password</h2>
         <PasswordForm
           onSubmit={handlePasswordChange}
           loading={loading === "password"}
         />
       </section>
 
-      <Separator />
-
-      <section className="border-t pt-8">
-        <h2 className="text-lg font-medium mb-4 text-destructive">
+      <section className="border border-destructive/40 p-6">
+        <h2 className="mb-4 text-xl font-bold tracking-tight text-destructive">
           Danger Zone
         </h2>
         <DeleteAccountButton
