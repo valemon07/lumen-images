@@ -235,9 +235,13 @@ export default function PhotoCard(props: {
       </DialogTrigger>
       <DialogContent className="top-[5vh] min-w-fit translate-y-0 sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto data-open:animate-none">
         <div
-          className="relative max-h-[80vh] overflow-hidden bg-mount p-[4%]"
+          // Sized from the photo's own ratio and never squeezed by the dialog's
+          // flex column: full width for landscape, height-capped (and centred)
+          // for portrait, so the photo always sits centred in its mount.
+          className="relative mx-auto shrink-0 overflow-hidden bg-mount"
           style={{
             aspectRatio: `${aspectRatio}`,
+            width: `min(100%, calc(62vh * ${aspectRatio}))`,
             viewTransitionName: lifting ? mountName : undefined,
           }}
         >
