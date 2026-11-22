@@ -1,6 +1,6 @@
 import { createAuthClient } from "better-auth/react";
-import { env } from "@/lib/env";
 
-export const authClient = createAuthClient({
-  baseURL: env.BETTER_AUTH_URL,
-});
+// Runs in the browser: never import "@/lib/env" here (server-only secrets).
+// Without a baseURL, better-auth uses the current origin, which also works
+// on Vercel preview deployments.
+export const authClient = createAuthClient();
