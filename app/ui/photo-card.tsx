@@ -72,6 +72,12 @@ export default function PhotoCard(props: {
   const [albumId, setAlbumId] = useState<string | null>(photo.album_id ?? null);
   const [albumDialogOpen, setAlbumDialogOpen] = useState(false);
   const attemptsRef = useRef(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const thumbRef = useRef<HTMLImageElement>(null);
+  // The grid image's already-loaded URL, shown in the dialog until the larger
+  // version arrives so the lift never lands on an empty mount.
+  const [thumbSrc, setThumbSrc] = useState<string | null>(null);
+  const [lifting, setLifting] = useState(false);
   const retryingRef = useRef(false);
 
   const handleAnalyze = async () => {
@@ -160,14 +166,28 @@ export default function PhotoCard(props: {
   const mountName = `mount-${photo.photo_id}`;
   const handleOpenChange = (open: boolean) => {
     const doc = document as Document & {
-      startViewTransition?: (cb: () => void) => unknown;
+      startViewTransition?: (cb: () => void) => { finished: Promise<void> };
     };
+    const src = thumbRef.current?.currentSrc || null;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!open || reduce || !doc.startViewTransition) {
+    const trigger = triggerRef.current;
+    if (!open || reduce || !doc.startViewTransition || !trigger) {
+      if (open) setThumbSrc(src);
       setModalOpen(open);
       return;
     }
-    doc.startViewTransition(() => flushSync(() => setModalOpen(true)));
+    // Only the opened card carries the name, and only for the old snapshot;
+    // the dialog mount takes it over for the new one.
+    trigger.style.viewTransitionName = mountName;
+    const transition = doc.startViewTransition(() => {
+      trigger.style.viewTransitionName = "";
+      flushSync(() => {
+        setThumbSrc(src);
+        setLifting(true);
+        setModalOpen(true);
+      });
+    });
+    transition.finished.finally(() => setLifting(false));
   };
 
   const readingRows = tags
@@ -184,7 +204,7 @@ export default function PhotoCard(props: {
     <Dialog open={modalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <button
-          style={{ viewTransitionName: modalOpen ? undefined : mountName }}
+          ref={triggerRef}
           className="grid aspect-square w-full cursor-pointer place-items-center bg-mount p-[6%] text-left hover:bg-[color-mix(in_oklch,var(--mount),var(--foreground)_10%)]">
           <div className="relative size-full">
           {failed ? (
@@ -193,6 +213,7 @@ export default function PhotoCard(props: {
             </div>
           ) : (
             <Image
+              ref={thumbRef}
               src={currentUrl}
               key={currentUrl}
               alt={photo.file_name}
@@ -211,12 +232,24 @@ export default function PhotoCard(props: {
       <DialogContent className="min-w-fit sm:max-w-3xl flex max-h-[90vh] flex-col overflow-y-auto data-open:animate-none">
         <div
           className="relative max-h-[80vh] overflow-hidden bg-mount p-[4%]"
-          style={{ aspectRatio: `${aspectRatio}`, viewTransitionName: mountName }}
+          style={{
+            aspectRatio: `${aspectRatio}`,
+            viewTransitionName: lifting ? mountName : undefined,
+          }}
         >
-          {!dialogLoaded && !failed && (
+          {!dialogLoaded && !failed && !thumbSrc && (
             <Skeleton className="absolute inset-0" />
           )}
           <div className="absolute inset-[4%]">
+          {!dialogLoaded && !failed && thumbSrc && (
+            // eslint-disable-next-line @next/next/no-img-element -- the grid's already-decoded image, held until the large one loads
+            <img
+              src={thumbSrc}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 size-full object-contain"
+            />
+          )}
           {failed ? (
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
               Failed to load
