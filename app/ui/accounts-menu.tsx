@@ -50,10 +50,10 @@ export default function AccountMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">My Account</Button>
+        <Button variant="outline">My account</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>My account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
@@ -93,7 +93,7 @@ export default function AccountMenu() {
               onSelect={(e) => e.preventDefault()}
             >
               <LogOutIcon />
-              Sign Out
+              Sign out
             </DropdownMenuItem>
           </AlertDialogTrigger>
 
@@ -113,7 +113,7 @@ export default function AccountMenu() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction variant="destructive" type="submit">
-                  Sign Out
+                  Sign out
                 </AlertDialogAction>
               </AlertDialogFooter>
             </form>

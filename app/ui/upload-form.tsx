@@ -119,9 +119,9 @@ export default function UploadForm({
   return (
     <div className="flex flex-col gap-x-4 gap-y-6">
       <div className="w-full max-w-sm">
-        <h2 className="text-xl font-bold tracking-tight">Upload Images</h2>
+        <h2 className="text-xl font-bold tracking-tight">Add photos</h2>
         <p className="text-sm text-muted-foreground">
-          Max size: <span className="tabular-nums">20MB</span>
+          JPEG, PNG or WebP, up to <span className="tabular-nums">20 MB</span> each.
         </p>
       </div>
       <div className="flex flex-col gap-4">
@@ -141,7 +141,7 @@ export default function UploadForm({
         />
         <Button onClick={handleUpload} disabled={uploading}>
           {uploading && <Loader2Icon className="mr-2 size-4 animate-spin" />}
-          {uploading ? "Uploading..." : "Upload Images"}
+          {uploading ? "Uploading..." : "Upload photos"}
         </Button>
       </div>
     </div>

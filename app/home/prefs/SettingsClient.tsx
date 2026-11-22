@@ -45,7 +45,7 @@ function NameForm({
         />
       </div>
       <Button type="submit" disabled={loading || !name.trim()}>
-        {loading ? "Saving..." : "Save Name"}
+        {loading ? "Saving..." : "Save name"}
       </Button>
     </form>
   );
@@ -68,7 +68,7 @@ function EmailForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">New Email Address</Label>
+        <Label htmlFor="email">New email address</Label>
         <Input
           id="email"
           type="email"
@@ -84,7 +84,7 @@ function EmailForm({
         link to the new address.
       </p>
       <Button type="submit" disabled={loading || !email.trim()}>
-        {loading ? "Sending..." : "Change Email"}
+        {loading ? "Sending..." : "Change email"}
       </Button>
     </form>
   );
@@ -117,7 +117,7 @@ function PasswordForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="currentPassword">Current Password</Label>
+        <Label htmlFor="currentPassword">Current password</Label>
         <Input
           id="currentPassword"
           type="password"
@@ -128,7 +128,7 @@ function PasswordForm({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="newPassword">New Password</Label>
+        <Label htmlFor="newPassword">New password</Label>
         <Input
           id="newPassword"
           type="password"
@@ -140,7 +140,7 @@ function PasswordForm({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+        <Label htmlFor="confirmPassword">Confirm new password</Label>
         <Input
           id="confirmPassword"
           type="password"
@@ -159,7 +159,7 @@ function PasswordForm({
           loading || !currentPassword || !newPassword || !confirmPassword
         }
       >
-        {loading ? "Changing..." : "Change Password"}
+        {loading ? "Changing..." : "Change password"}
       </Button>
     </form>
   );
@@ -176,7 +176,7 @@ function DeleteAccountButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" disabled={loading}>
-          {loading ? "Deleting..." : "Delete Account"}
+          {loading ? "Deleting..." : "Delete account"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent size="sm">
@@ -195,7 +195,7 @@ function DeleteAccountButton({
             onClick={onClick}
             disabled={loading}
           >
-            Delete Account
+            Delete account
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -264,7 +264,7 @@ export default function SettingsClient() {
 
       <section className="border border-destructive/40 p-6">
         <h2 className="mb-4 text-xl font-bold tracking-tight text-destructive">
-          Danger Zone
+          Danger zone
         </h2>
         <DeleteAccountButton
           onClick={handleDeleteAccount}

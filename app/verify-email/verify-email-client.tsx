@@ -58,12 +58,12 @@ export default function VerifyEmailClient() {
       <div className="flex flex-col gap-3">
         <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">
           {status === "verified"
-            ? "Email Verified"
+            ? "Email verified"
             : status === "error"
-              ? "Verification Failed"
+              ? "Verification failed"
               : token
                 ? "Verifying..."
-                : "Check Your Email"}
+                : "Check your email"}
         </h1>
         <p className="text-base text-muted-foreground">
           {status === "verified"
@@ -95,7 +95,7 @@ export default function VerifyEmailClient() {
               />
             </div>
             <Button type="submit" size="lg" className="w-full" disabled={resending || !email.trim()}>
-              {resending ? "Sending..." : "Resend Verification Email"}
+              {resending ? "Sending..." : "Resend verification email"}
             </Button>
           </form>
         </div>

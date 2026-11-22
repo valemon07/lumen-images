@@ -13,7 +13,7 @@ function sharedGroups(photos: SamplePhoto[], limit = 2) {
   for (const p of photos) {
     const r = p.reading;
     const labels = [r.timeOfDay, r.weather, r.mood, r.colorPalette, ...r.composition];
-    for (const l of new Set(labels)) {
+    for (const l of new Set(labels.filter((x) => x !== "unknown"))) {
       byLabel.set(l, [...(byLabel.get(l) ?? []), p]);
     }
   }
@@ -82,7 +82,7 @@ export default function Home() {
               <div key={p.file} className="relative w-[15rem] shrink-0 snap-start sm:w-[18rem] lg:w-[20rem]">
                 {i === 0 && (
                   <Tape className="absolute -top-5 left-4 z-10 -rotate-2">
-                    {p.reading.weather} · {p.reading.timeOfDay}
+                    {p.reading.weather}
                   </Tape>
                 )}
                 {i === 2 && (

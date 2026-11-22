@@ -198,7 +198,7 @@ export default function PhotoCard(props: {
         <DialogFooter className="flex flex-col sm:flex-col">
           <Accordion type="single" collapsible>
             <AccordionItem value="metadata">
-              <AccordionTrigger>View Metadata...</AccordionTrigger>
+              <AccordionTrigger>File details</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col gap-2">
                   <div>
@@ -228,7 +228,7 @@ export default function PhotoCard(props: {
           {tags && tags.length > 0 && (
             <Accordion type="single" collapsible>
               <AccordionItem value="tags">
-                <AccordionTrigger>View Tags...</AccordionTrigger>
+                <AccordionTrigger>What Lumen read</AccordionTrigger>
                 <AccordionContent>
                   <div className="flex flex-col gap-3">
                     {Object.entries(
@@ -274,7 +274,7 @@ export default function PhotoCard(props: {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Select Album</DialogTitle>
+                  <DialogTitle>Choose album</DialogTitle>
                 </DialogHeader>
                 <AlbumUploadChooser
                   selectedAlbumId={albumId}
@@ -298,35 +298,38 @@ export default function PhotoCard(props: {
             )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant={"destructive"}>Delete</Button>
+                <Button
+                  variant="outline"
+                  className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  Delete
+                </Button>
               </AlertDialogTrigger>
               <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                  <AlertDialogMedia className="rounded-none bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                  <AlertDialogMedia className="rounded-none bg-transparent text-destructive">
                     <Trash2Icon />
                   </AlertDialogMedia>
-                  <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete this photo?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete the image. Double check
-                    you&apos;re deleting the right image!
+                    This removes the photo and everything Lumen read in it.
+                    It can&apos;t be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel variant={"outline"}>
                     Cancel
                   </AlertDialogCancel>
-                  <AlertDialogAction asChild>
-                    <Button
-                      variant={"destructive"}
-                      onClick={() => {
-                        if (photo) {
-                          onDelete(photo);
-                        }
-                        setModalOpen(false);
-                      }}
-                    >
-                      Delete
-                    </Button>
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={() => {
+                      if (photo) {
+                        onDelete(photo);
+                      }
+                      setModalOpen(false);
+                    }}
+                  >
+                    Delete photo
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

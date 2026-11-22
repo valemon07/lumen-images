@@ -1,12 +1,12 @@
 // Landing-page sample photos.
 //
-// Drop your own photos into `public/landing/` using the file names below.
-// Until a file exists, its slot renders as an empty mount labelled with the
-// file name it is waiting for.
+// The photos in `public/landing/` are Unsplash stock (see CREDITS.md there);
+// swap in your own using the same file names. Until a file exists, its slot
+// renders as an empty mount labelled with the file name it is waiting for.
 //
 // The tags are SAMPLE readings written by hand in the exact shape and
-// vocabulary `/api/analyze` returns. Once your photos are in, replace them
-// with what Lumen actually returned for each photo.
+// vocabulary `/api/analyze` returns. Once you run the real photos through
+// Lumen, replace them with what it actually returned.
 
 export type SampleReading = {
   subjects: string[];
@@ -28,71 +28,71 @@ export type SamplePhoto = {
 export const samplePhotos: SamplePhoto[] = [
   {
     file: "harbour.jpg",
-    alt: "Fishing boat moored against a harbour wall on a grey morning",
+    alt: "Work boat heading out over grey water with gulls wheeling around it",
     orientation: "landscape",
     reading: {
-      subjects: ["fishing boat", "harbour wall", "gulls"],
+      subjects: ["boat", "gulls", "sea"],
       setting: "outdoor",
       timeOfDay: "morning",
       weather: "overcast",
-      mood: "quiet",
-      composition: ["leading lines", "wide angle"],
+      mood: "restless",
+      composition: ["rule of thirds", "wide angle"],
       colorPalette: "cool",
     },
   },
   {
     file: "street.jpg",
-    alt: "Cyclist crossing a wet street under shop signs",
+    alt: "Cyclist in a clear rain poncho riding down a wet street past a shopfront",
     orientation: "portrait",
     reading: {
-      subjects: ["cyclist", "street", "shop signs"],
+      subjects: ["cyclist", "rain poncho", "shopfront"],
       setting: "outdoor",
       timeOfDay: "afternoon",
       weather: "rainy",
-      mood: "hurried",
+      mood: "determined",
       composition: ["rule of thirds"],
       colorPalette: "high contrast",
     },
   },
   {
     file: "field.jpg",
-    alt: "Lone tree in a field with low sun behind it",
+    alt: "Lone tree in a grass field with the low sun directly behind its trunk",
     orientation: "landscape",
     reading: {
-      subjects: ["tree", "field"],
+      subjects: ["tree", "field", "sun"],
       setting: "outdoor",
       timeOfDay: "golden hour",
       weather: "clear",
       mood: "calm",
-      composition: ["silhouette", "rule of thirds"],
-      colorPalette: "warm",
+      composition: ["silhouette", "symmetry"],
+      colorPalette: "high contrast",
     },
   },
   {
     file: "portrait.jpg",
-    alt: "Person by a window, face half in shadow",
+    alt: "Woman in a red hat by a window, half her face in shadow",
     orientation: "portrait",
     reading: {
-      subjects: ["person", "window"],
+      subjects: ["woman", "red hat", "window"],
       setting: "indoor",
       timeOfDay: "afternoon",
-      weather: "overcast",
-      mood: "thoughtful",
-      composition: ["portrait", "bokeh"],
-      colorPalette: "neutral",
+      weather: "unknown",
+      mood: "pensive",
+      composition: ["portrait", "rule of thirds"],
+      colorPalette: "high contrast",
     },
   },
   {
     file: "skyline.jpg",
-    alt: "City skyline at dusk with lights coming on",
+    alt: "City skyline across a river at dusk, lights coming on and reflected in the water",
     orientation: "landscape",
     reading: {
-      subjects: ["skyline", "towers"],
+      subjects: ["skyline", "river", "towers"],
       setting: "outdoor",
-      timeOfDay: "golden hour",
+      timeOfDay: "dusk",
       weather: "clear",
-      mood: "expectant",
-      composition: ["symmetry", "wide angle"],
+      mood: "quiet",
+      composition: ["wide angle"],
       colorPalette: "warm",
     },
   },

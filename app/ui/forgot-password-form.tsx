@@ -34,7 +34,7 @@ export default function ForgotPasswordForm() {
     >
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Forgot Password</h1>
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Forgot password</h1>
           <p className="text-base text-muted-foreground">
             Enter your email and we&apos;ll send you a link to reset your
             password.
@@ -61,7 +61,7 @@ export default function ForgotPasswordForm() {
           {message && <p className="text-sm text-muted-foreground">{message}</p>}
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" size="lg" className="w-full" disabled={loading || !email.trim()}>
-            {loading ? "Sending..." : "Send Reset Link"}
+            {loading ? "Sending..." : "Send reset link"}
           </Button>
         </div>
       </div>

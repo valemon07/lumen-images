@@ -20,7 +20,7 @@ export default function NewPhotoButton({ albumId }: { albumId?: string }) {
       <DialogTrigger asChild>
         <Button>
           <PlusIcon />
-          Upload Photos
+          Upload photos
         </Button>
       </DialogTrigger>
       <DialogContent

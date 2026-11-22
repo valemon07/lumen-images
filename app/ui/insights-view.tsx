@@ -1,56 +1,17 @@
-import {
-  Building2,
-  Camera,
-  CloudSun,
-  Heart,
-  LayoutGrid,
-  Palette,
-  Sparkles,
-  Sun,
-  Tags,
-} from "lucide-react";
 import { CategoryStat, InsightsData } from "../lib/types";
 import { cn } from "@/lib/utils";
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  sublabel,
-}: {
-  icon: typeof Camera;
-  label: string;
-  value: string;
-  sublabel?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-2 border border-border p-5">
-      <div className="flex items-center justify-between">
-        <span className="text-base font-bold tracking-tight">{label}</span>
-        <Icon className="size-4 text-muted-foreground" />
-      </div>
-      <div className="text-3xl font-black tracking-[-0.035em] tabular-nums">{value}</div>
-      {sublabel && (
-        <div className="text-xs text-muted-foreground tabular-nums">{sublabel}</div>
-      )}
-    </div>
-  );
-}
-
 function BreakdownCard({
-  icon: Icon,
   title,
   stats,
 }: {
-  icon: typeof Building2;
   title: string;
   stats: CategoryStat[];
 }) {
   return (
     <section className="flex flex-col gap-4 border-t border-border pt-4">
       <h2 className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-2 -rotate-1 bg-tape px-2.5 py-0.5 font-tape text-base leading-snug text-tape-foreground">
-          <Icon className="size-4" />
+        <span className="inline-block -rotate-1 bg-tape px-2.5 py-0.5 font-tape text-lg leading-snug text-tape-foreground">
           {title}
         </span>
       </h2>
@@ -58,7 +19,7 @@ function BreakdownCard({
         {stats.map((stat) => (
           <div key={stat.label} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
-              <span className="capitalize">{stat.label}</span>
+              <span>{stat.label}</span>
               <span className="text-right text-muted-foreground tabular-nums">
                 {stat.count} · {stat.percentage}%
               </span>
@@ -82,11 +43,9 @@ function BreakdownCard({
 }
 
 function RankedListCard({
-  icon: Icon,
   title,
   items,
 }: {
-  icon: typeof Tags;
   title: string;
   items: { label: string; count: number }[];
 }) {
@@ -94,8 +53,7 @@ function RankedListCard({
   return (
     <section className="flex flex-col gap-4 border-t border-border pt-4">
       <h2 className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-2 -rotate-1 bg-tape px-2.5 py-0.5 font-tape text-base leading-snug text-tape-foreground">
-          <Icon className="size-4" />
+        <span className="inline-block -rotate-1 bg-tape px-2.5 py-0.5 font-tape text-lg leading-snug text-tape-foreground">
           {title}
         </span>
       </h2>
@@ -107,7 +65,7 @@ function RankedListCard({
                 <span className="w-4 text-right text-xs text-muted-foreground tabular-nums">
                   {index + 1}
                 </span>
-                <span className="capitalize">{item.label}</span>
+                <span>{item.label}</span>
               </span>
               <span className="text-right text-muted-foreground tabular-nums">{item.count}</span>
             </div>
@@ -130,74 +88,37 @@ function RankedListCard({
 }
 
 export default function InsightsView({ data }: { data: InsightsData }) {
-  const { totalPhotos, taggedPhotos, perCategory, topSubjects, topMoods } =
-    data;
+  const { perCategory, topSubjects, topMoods } = data;
+  // COUNT(*) comes back from postgres as a string; normalise to numbers.
+  const totalPhotos = Number(data.totalPhotos);
+  const taggedPhotos = Number(data.taggedPhotos);
   const coverage =
     totalPhotos > 0 ? Math.round((taggedPhotos / totalPhotos) * 100) : 0;
+  const count = (label: string) =>
+    Number(perCategory.setting.find((s) => s.label === label)?.count ?? 0);
 
   return (
-    <div className="flex flex-col gap-8 w-full">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={Camera}
-          label="Total Photos"
-          value={totalPhotos.toLocaleString()}
-        />
-        <StatCard
-          icon={Sparkles}
-          label="Analyzed Photos"
-          value={taggedPhotos.toLocaleString()}
-          sublabel={`${coverage}% of your library`}
-        />
-        <StatCard
-          icon={Building2}
-          label="Indoor Photos"
-          value={(
-            perCategory.setting.find((s) => s.label === "indoor")?.count ?? 0
-          ).toLocaleString()}
-          sublabel="from the Setting tag"
-        />
-        <StatCard
-          icon={Sun}
-          label="Outdoor Photos"
-          value={(
-            perCategory.setting.find((s) => s.label === "outdoor")?.count ?? 0
-          ).toLocaleString()}
-          sublabel="from the Setting tag"
-        />
+    <div className="flex w-full flex-col gap-12">
+      <p className="max-w-[70ch] text-lg text-muted-foreground tabular-nums">
+        Lumen has read{" "}
+        <span className="font-semibold text-foreground">
+          {taggedPhotos} of your {totalPhotos} photos
+        </span>{" "}
+        ({coverage}%). {count("outdoor")} were taken outdoors, {count("indoor")}{" "}
+        indoors.
+      </p>
+
+      <div className="grid grid-cols-1 gap-x-10 gap-y-10 md:grid-cols-2">
+        <RankedListCard title="What's in them" items={topSubjects} />
+        <RankedListCard title="Moods" items={topMoods} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-        <BreakdownCard
-          icon={Building2}
-          title="Setting"
-          stats={perCategory.setting}
-        />
-        <BreakdownCard
-          icon={Sun}
-          title="Time of Day"
-          stats={perCategory.timeOfDay}
-        />
-        <BreakdownCard
-          icon={CloudSun}
-          title="Weather"
-          stats={perCategory.weather}
-        />
-        <BreakdownCard
-          icon={Palette}
-          title="Color Palette"
-          stats={perCategory.colorPalette}
-        />
-        <BreakdownCard
-          icon={LayoutGrid}
-          title="Composition"
-          stats={perCategory.composition}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-        <RankedListCard icon={Tags} title="Top Subjects" items={topSubjects} />
-        <RankedListCard icon={Heart} title="Top Moods" items={topMoods} />
+      <div className="grid grid-cols-1 gap-x-10 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
+        <BreakdownCard title="Light" stats={perCategory.timeOfDay} />
+        <BreakdownCard title="Weather" stats={perCategory.weather} />
+        <BreakdownCard title="Composition" stats={perCategory.composition} />
+        <BreakdownCard title="Palette" stats={perCategory.colorPalette} />
+        <BreakdownCard title="Setting" stats={perCategory.setting} />
       </div>
     </div>
   );

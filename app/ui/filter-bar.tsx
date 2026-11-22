@@ -33,10 +33,10 @@ interface FilterBarProps {
 }
 
 const DATE_PRESETS: { label: string; value: DateFilter }[] = [
-  { label: "All Time", value: { type: "all" } },
+  { label: "All time", value: { type: "all" } },
   { label: "Last 7 days", value: { type: "preset", days: 7 } },
   { label: "Last 30 days", value: { type: "preset", days: 30 } },
-  { label: "Last Year", value: { type: "preset", days: 365 } },
+  { label: "Last year", value: { type: "preset", days: 365 } },
 ];
 
 export default function FilterBar({ filters, onChange }: FilterBarProps) {

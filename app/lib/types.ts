@@ -95,9 +95,9 @@ export type FilterCategory = (typeof FILTER_CATEGORIES)[number];
 
 export const CATEGORY_LABELS: Record<FilterCategory, string> = {
   setting: 'Setting',
-  timeOfDay: 'Time of Day',
+  timeOfDay: 'Time of day',
   weather: 'Weather',
-  colorPalette: 'Color Palette',
+  colorPalette: 'Color palette',
   composition: 'Composition',
 };
 

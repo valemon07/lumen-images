@@ -29,12 +29,12 @@ export default function NewAlbumButton() {
       <DialogTrigger asChild>
         <Button>
           <PlusIcon />
-          New Album
+          New album
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Album</DialogTitle>
+          <DialogTitle>Create a new album</DialogTitle>
         </DialogHeader>
         <Input
           placeholder="Album Name..."

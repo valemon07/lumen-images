@@ -61,7 +61,7 @@ export default function ResetPasswordClient() {
     return (
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Password Reset</h1>
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Password reset</h1>
           <p className="text-base text-muted-foreground">
             Your password has been reset successfully. You can now log in with
             your new password.
@@ -83,13 +83,13 @@ export default function ResetPasswordClient() {
     >
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Reset Password</h1>
+          <h1 className="text-4xl font-black leading-none tracking-[-0.04em]">Reset password</h1>
           <p className="text-base text-muted-foreground">Enter your new password.</p>
         </div>
         <div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">New password</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -103,7 +103,7 @@ export default function ResetPasswordClient() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -126,7 +126,7 @@ export default function ResetPasswordClient() {
             className="w-full"
             disabled={loading || !newPassword || !confirmPassword}
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? "Resetting..." : "Reset password"}
           </Button>
         </div>
       </div>
