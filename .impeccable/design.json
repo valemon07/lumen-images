@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-22T20:34:28+00:00",
+  "title": "Design System: Lumen",
+  "extensions": {
+    "colorMeta": {
+      "flash-yellow": {
+        "role": "primary",
+        "displayName": "Flash Yellow",
+        "canonical": "oklch(0.852 0.199 91.936)",
+        "tonalRamp": [
+          "oklch(0.150 0.050 91.936)",
+          "oklch(0.264 0.050 91.936)",
+          "oklch(0.379 0.050 91.936)",
+          "oklch(0.493 0.085 91.936)",
+          "oklch(0.607 0.121 91.936)",
+          "oklch(0.721 0.157 91.936)",
+          "oklch(0.836 0.194 91.936)",
+          "oklch(0.950 0.168 91.936)"
+        ]
+      },
+      "marker-ink": {
+        "role": "neutral",
+        "displayName": "Marker Ink",
+        "canonical": "oklch(0.2 0 0)",
+        "tonalRamp": [
+          "oklch(0.150 0.000 0)",
+          "oklch(0.264 0.000 0)",
+          "oklch(0.379 0.000 0)",
+          "oklch(0.493 0.000 0)",
+          "oklch(0.607 0.000 0)",
+          "oklch(0.721 0.000 0)",
+          "oklch(0.836 0.000 0)",
+          "oklch(0.950 0.000 0)"
+        ]
+      },
+      "lit-table": {
+        "role": "neutral",
+        "displayName": "Lit Table",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": [
+          "oklch(0.150 0.000 0)",
+          "oklch(0.264 0.000 0)",
+          "oklch(0.379 0.000 0)",
+          "oklch(0.493 0.000 0)",
+          "oklch(0.607 0.000 0)",
+          "oklch(0.721 0.000 0)",
+          "oklch(0.836 0.000 0)",
+          "oklch(0.950 0.000 0)"
+        ]
+      },
+      "slide-mount": {
+        "role": "neutral",
+        "displayName": "Slide Mount",
+        "canonical": "oklch(0.88 0.004 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.001 106)",
+          "oklch(0.264 0.001 106)",
+          "oklch(0.379 0.001 106)",
+          "oklch(0.493 0.002 106)",
+          "oklch(0.607 0.002 106)",
+          "oklch(0.721 0.003 106)",
+          "oklch(0.836 0.004 106)",
+          "oklch(0.950 0.004 106)"
+        ]
+      },
+      "table-wash": {
+        "role": "neutral",
+        "displayName": "Table Wash",
+        "canonical": "oklch(0.955 0.003 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.001 106)",
+          "oklch(0.264 0.001 106)",
+          "oklch(0.379 0.001 106)",
+          "oklch(0.493 0.001 106)",
+          "oklch(0.607 0.001 106)",
+          "oklch(0.721 0.002 106)",
+          "oklch(0.836 0.002 106)",
+          "oklch(0.950 0.003 106)"
+        ]
+      },
+      "pencil-grey": {
+        "role": "neutral",
+        "displayName": "Pencil Grey",
+        "canonical": "oklch(0.47 0.008 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.004 106)",
+          "oklch(0.264 0.005 106)",
+          "oklch(0.379 0.007 106)",
+          "oklch(0.493 0.008 106)",
+          "oklch(0.607 0.006 106)",
+          "oklch(0.721 0.005 106)",
+          "oklch(0.836 0.003 106)",
+          "oklch(0.950 0.002 106)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.86 0.004 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.001 106)",
+          "oklch(0.264 0.001 106)",
+          "oklch(0.379 0.001 106)",
+          "oklch(0.493 0.002 106)",
+          "oklch(0.607 0.002 106)",
+          "oklch(0.721 0.003 106)",
+          "oklch(0.836 0.004 106)",
+          "oklch(0.950 0.003 106)"
+        ]
+      },
+      "field-stroke": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "oklch(0.62 0.008 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.002 106)",
+          "oklch(0.264 0.003 106)",
+          "oklch(0.379 0.005 106)",
+          "oklch(0.493 0.006 106)",
+          "oklch(0.607 0.008 106)",
+          "oklch(0.721 0.007 106)",
+          "oklch(0.836 0.005 106)",
+          "oklch(0.950 0.004 106)"
+        ]
+      },
+      "safelight-red": {
+        "role": "error",
+        "displayName": "Safelight Red",
+        "canonical": "oklch(0.53 0.2 27)",
+        "tonalRamp": [
+          "oklch(0.150 0.078 27)",
+          "oklch(0.264 0.115 27)",
+          "oklch(0.379 0.152 27)",
+          "oklch(0.493 0.188 27)",
+          "oklch(0.607 0.175 27)",
+          "oklch(0.721 0.139 27)",
+          "oklch(0.836 0.102 27)",
+          "oklch(0.950 0.066 27)"
+        ]
+      },
+      "unlit-table": {
+        "role": "neutral",
+        "displayName": "Unlit Table",
+        "canonical": "oklch(0.185 0 0)",
+        "tonalRamp": [
+          "oklch(0.150 0.000 0)",
+          "oklch(0.264 0.000 0)",
+          "oklch(0.379 0.000 0)",
+          "oklch(0.493 0.000 0)",
+          "oklch(0.607 0.000 0)",
+          "oklch(0.721 0.000 0)",
+          "oklch(0.836 0.000 0)",
+          "oklch(0.950 0.000 0)"
+        ]
+      },
+      "unlit-card": {
+        "role": "neutral",
+        "displayName": "Unlit Card",
+        "canonical": "oklch(0.22 0.002 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.002 106)",
+          "oklch(0.264 0.002 106)",
+          "oklch(0.379 0.001 106)",
+          "oklch(0.493 0.001 106)",
+          "oklch(0.607 0.001 106)",
+          "oklch(0.721 0.001 106)",
+          "oklch(0.836 0.001 106)",
+          "oklch(0.950 0.001 106)"
+        ]
+      },
+      "unlit-mount": {
+        "role": "neutral",
+        "displayName": "Unlit Mount",
+        "canonical": "oklch(0.285 0.003 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.002 106)",
+          "oklch(0.264 0.003 106)",
+          "oklch(0.379 0.003 106)",
+          "oklch(0.493 0.002 106)",
+          "oklch(0.607 0.001 106)",
+          "oklch(0.721 0.001 106)",
+          "oklch(0.836 0.001 106)",
+          "oklch(0.950 0.001 106)"
+        ]
+      },
+      "unlit-wash": {
+        "role": "neutral",
+        "displayName": "Unlit Wash",
+        "canonical": "oklch(0.26 0.003 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.002 106)",
+          "oklch(0.264 0.003 106)",
+          "oklch(0.379 0.002 106)",
+          "oklch(0.493 0.002 106)",
+          "oklch(0.607 0.001 106)",
+          "oklch(0.721 0.001 106)",
+          "oklch(0.836 0.001 106)",
+          "oklch(0.950 0.001 106)"
+        ]
+      },
+      "chalk-ink": {
+        "role": "neutral",
+        "displayName": "Chalk Ink",
+        "canonical": "oklch(0.955 0.004 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.001 106)",
+          "oklch(0.264 0.001 106)",
+          "oklch(0.379 0.001 106)",
+          "oklch(0.493 0.001 106)",
+          "oklch(0.607 0.002 106)",
+          "oklch(0.721 0.003 106)",
+          "oklch(0.836 0.003 106)",
+          "oklch(0.950 0.004 106)"
+        ]
+      },
+      "unlit-pencil": {
+        "role": "neutral",
+        "displayName": "Unlit Pencil",
+        "canonical": "oklch(0.74 0.008 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.002 106)",
+          "oklch(0.264 0.002 106)",
+          "oklch(0.379 0.003 106)",
+          "oklch(0.493 0.005 106)",
+          "oklch(0.607 0.006 106)",
+          "oklch(0.721 0.008 106)",
+          "oklch(0.836 0.007 106)",
+          "oklch(0.950 0.005 106)"
+        ]
+      },
+      "unlit-hairline": {
+        "role": "neutral",
+        "displayName": "Unlit Hairline",
+        "canonical": "oklch(0.32 0.004 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.003 106)",
+          "oklch(0.264 0.004 106)",
+          "oklch(0.379 0.004 106)",
+          "oklch(0.493 0.003 106)",
+          "oklch(0.607 0.002 106)",
+          "oklch(0.721 0.001 106)",
+          "oklch(0.836 0.001 106)",
+          "oklch(0.950 0.001 106)"
+        ]
+      },
+      "unlit-field-stroke": {
+        "role": "neutral",
+        "displayName": "Unlit Field Stroke",
+        "canonical": "oklch(0.55 0.008 106)",
+        "tonalRamp": [
+          "oklch(0.150 0.003 106)",
+          "oklch(0.264 0.004 106)",
+          "oklch(0.379 0.006 106)",
+          "oklch(0.493 0.007 106)",
+          "oklch(0.607 0.007 106)",
+          "oklch(0.721 0.006 106)",
+          "oklch(0.836 0.004 106)",
+          "oklch(0.950 0.003 106)"
+        ]
+      },
+      "unlit-safelight-red": {
+        "role": "error",
+        "displayName": "Unlit Safelight Red",
+        "canonical": "oklch(0.68 0.19 25)",
+        "tonalRamp": [
+          "oklch(0.150 0.048 25)",
+          "oklch(0.264 0.064 25)",
+          "oklch(0.379 0.098 25)",
+          "oklch(0.493 0.133 25)",
+          "oklch(0.607 0.168 25)",
+          "oklch(0.721 0.177 25)",
+          "oklch(0.836 0.143 25)",
+          "oklch(0.950 0.108 25)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero and signed-in home headline."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing section heads."
+      },
+      "page-title": {
+        "displayName": "Page Title",
+        "purpose": "Signed-in page h1 on a 1.5px ink rule; auth titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "In-page section heads above an ink rule."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Muted paragraph under a headline, max 60ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Readings, forms, general copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, nav, captions, counts."
+      },
+      "tape": {
+        "displayName": "Tape",
+        "purpose": "Kalam, only inside yellow tape labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "float",
+        "value": "0 12px 32px -16px rgb(0 0 0 / 0.35)",
+        "purpose": "Overlays only: dialogs, popovers, menus, sheets. Nothing on the table casts a shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-mount",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Easing for the mount turn and the mount lift."
+      },
+      {
+        "name": "mount-turn",
+        "value": "rotateY(180deg) 500ms, perspective 1400px",
+        "purpose": "Landing: hover or press turns a mount over to its reading. Reduced motion: 200ms cross-fade."
+      },
+      {
+        "name": "mount-lift",
+        "value": "view-transition-name lifted-mount; group 420ms, clipped; old snapshot fade 120ms; snapshots object-fit contain; root cross-fade 180ms",
+        "purpose": "App: opening a photo lifts its mount into the dialog. One fixed name held by one element at a time (clicked card for the old snapshot, dialog mount only while lifting); the dialog shows the grid's loaded image until the large one arrives. Reduced motion or no support: instant."
+      },
+      {
+        "name": "state",
+        "value": "150ms color",
+        "purpose": "Button and mount hover colour changes."
+      },
+      {
+        "name": "image-in",
+        "value": "opacity 300ms",
+        "purpose": "Photo fades in over its mount once loaded."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ],
+    "darkMode": {
+      "strategy": ".dark class via next-themes, system default",
+      "pairs": {
+        "lit-table": "unlit-table",
+        "slide-mount": "unlit-mount",
+        "table-wash": "unlit-wash",
+        "marker-ink": "chalk-ink",
+        "pencil-grey": "unlit-pencil",
+        "hairline": "unlit-hairline",
+        "field-stroke": "unlit-field-stroke",
+        "safelight-red": "unlit-safelight-red"
+      },
+      "unchanged": [
+        "flash-yellow"
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one yellow action per view; ink text on flash yellow.",
+      "html": "<button class=\"ds-btn-primary\">Start your lightbox</button>",
+      "css": ".ds-btn-primary{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);height:48px;padding:0 24px;font-size:1rem;font-weight:600;background:var(--primary,oklch(0.852 0.199 91.936));color:var(--primary-foreground,oklch(0.2 0 0));border:1.5px solid var(--foreground,oklch(0.2 0 0));border-radius:0.15rem;cursor:pointer;transition:background-color 150ms} .ds-btn-primary:hover{background:color-mix(in oklch,var(--primary,oklch(0.852 0.199 91.936)),var(--foreground,oklch(0.2 0 0)) 12%)} .ds-btn-primary:focus-visible{outline:2px solid var(--ring,oklch(0.2 0 0));outline-offset:2px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Default secondary action: ink border, no fill.",
+      "html": "<button class=\"ds-btn-outline\">All photos</button>",
+      "css": ".ds-btn-outline{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);height:36px;padding:0 14px;font-size:.875rem;font-weight:600;background:transparent;color:var(--foreground,oklch(0.2 0 0));border:1.5px solid var(--foreground,oklch(0.2 0 0));border-radius:0.15rem;cursor:pointer;transition:background-color 150ms} .ds-btn-outline:hover{background:var(--muted,oklch(0.955 0.003 106))} .ds-btn-outline:focus-visible{outline:2px solid var(--ring,oklch(0.2 0 0));outline-offset:2px}"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Confirms a delete; safelight red fill.",
+      "html": "<button class=\"ds-btn-destructive\">Delete photo</button>",
+      "css": ".ds-btn-destructive{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);height:36px;padding:0 14px;font-size:.875rem;font-weight:600;background:var(--destructive,oklch(0.53 0.2 27));color:var(--destructive-foreground,oklch(1 0 0));border:1.5px solid var(--destructive,oklch(0.53 0.2 27));border-radius:0.15rem;cursor:pointer;transition:background-color 150ms} .ds-btn-destructive:hover{background:color-mix(in oklch,var(--destructive,oklch(0.53 0.2 27)),var(--foreground,oklch(0.2 0 0)) 14%)} .ds-btn-destructive:focus-visible{outline:2px solid var(--ring,oklch(0.2 0 0));outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Hairline field, near-square.",
+      "html": "<input class=\"ds-input\" placeholder=\"you@example.com\" />",
+      "css": ".ds-input{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);height:32px;width:240px;padding:4px 10px;font-size:.875rem;background:transparent;color:var(--foreground,oklch(0.2 0 0));border:1px solid var(--input,oklch(0.62 0.008 106));border-radius:0.15rem;outline:none} .ds-input::placeholder{color:var(--muted-foreground,oklch(0.47 0.008 106))} .ds-input:focus-visible{border-color:var(--ring,oklch(0.2 0 0));outline:2px solid var(--ring,oklch(0.2 0 0));outline-offset:2px}"
+    },
+    {
+      "name": "Mount",
+      "kind": "custom",
+      "refersTo": "mount",
+      "description": "The grey slide mount framing every photo; darkens on hover.",
+      "html": "<button class=\"ds-mount\"><span class=\"ds-mount-photo\"></span></button>",
+      "css": ".ds-mount{display:grid;place-items:center;width:200px;aspect-ratio:1;padding:6%;border:0;border-radius:0;background:var(--mount,oklch(0.88 0.004 106));cursor:pointer;transition:background-color 150ms} .ds-mount:hover{background:color-mix(in oklch,var(--mount,oklch(0.88 0.004 106)),var(--foreground,oklch(0.2 0 0)) 10%)} .ds-mount:focus-visible{outline:2px solid var(--ring,oklch(0.2 0 0));outline-offset:4px} .ds-mount-photo{display:block;width:100%;aspect-ratio:3/2;background:oklch(0.62 0.06 200)}"
+    },
+    {
+      "name": "Tape Label",
+      "kind": "chip",
+      "refersTo": "tape",
+      "description": "Hand-lettered yellow tape that names a group of photos.",
+      "html": "<span class=\"ds-tape\">golden hour</span>",
+      "css": ".ds-tape{display:inline-block;padding:2px 10px;font-family:var(--font-kalam,'Kalam',cursive);font-weight:700;font-size:1.125rem;line-height:1.375;background:var(--tape,oklch(0.852 0.199 91.936));color:var(--tape-foreground,oklch(0.2 0 0));border-radius:0;transform:rotate(-1deg)}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Square hairline chip for flat lists of tied labels.",
+      "html": "<ul class=\"ds-chips\"><li class=\"ds-chip\">doorway</li><li class=\"ds-chip\">tree</li></ul>",
+      "css": ".ds-chips{display:flex;gap:6px;list-style:none;margin:0;padding:0} .ds-chip{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);font-size:.875rem;padding:2px 8px;border:1px solid var(--border,oklch(0.86 0.004 106));border-radius:0;color:var(--foreground,oklch(0.2 0 0))}"
+    },
+    {
+      "name": "Reading",
+      "kind": "card",
+      "refersTo": "mount",
+      "description": "What Lumen read: label/value rows under a 1.5px ink rule.",
+      "html": "<section class=\"ds-reading\"><h3>What Lumen read</h3><dl><dt>Subjects</dt><dd>boat, gulls</dd><dt>Mood</dt><dd>calm</dd><dt>Palette</dt><dd>cool</dd></dl></section>",
+      "css": ".ds-reading{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);width:320px;color:var(--foreground,oklch(0.2 0 0))} .ds-reading h3{margin:0;padding-bottom:8px;font-size:1rem;font-weight:700;letter-spacing:-0.025em;border-bottom:1.5px solid var(--foreground,oklch(0.2 0 0))} .ds-reading dl{display:grid;grid-template-columns:8rem 1fr;margin:0;font-size:.875rem} .ds-reading dt,.ds-reading dd{margin:0;padding:8px 0;border-bottom:1px solid var(--border,oklch(0.86 0.004 106))} .ds-reading dt{color:var(--muted-foreground,oklch(0.47 0.008 106))} .ds-reading dd{font-weight:600}"
+    },
+    {
+      "name": "Data Bar",
+      "kind": "custom",
+      "description": "Insights bar: ink fill on a wash track, never yellow.",
+      "html": "<div class=\"ds-bar\"><div class=\"ds-bar-row\"><span>golden hour</span><span class=\"ds-bar-n\">12 · 40%</span></div><div class=\"ds-bar-track\"><div class=\"ds-bar-fill\" style=\"width:40%\"></div></div></div>",
+      "css": ".ds-bar{font-family:var(--font-sans, 'Hanken Grotesk', sans-serif);width:280px;color:var(--foreground,oklch(0.2 0 0))} .ds-bar-row{display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:4px} .ds-bar-n{color:var(--muted-foreground,oklch(0.47 0.008 106));font-variant-numeric:tabular-nums} .ds-bar-track{height:8px;background:var(--muted,oklch(0.955 0.003 106))} .ds-bar-fill{height:100%;background:var(--foreground,oklch(0.2 0 0))}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lightbox",
+    "overview": "Lumen is a lit table. Photos lie on it in grey slide mounts, Lumen writes down what it sees in each one, and yellow tape groups the ones that belong together. In light mode the table is backlit white; in dark mode it is the same table with the light switched off, charcoal under grey-brown mounts. The photographs are the brightest, most colourful thing on any screen, and everything else is ink, grey and one flash of yellow.\n\nThe system is flat and drawn. Structure comes from black marker rules (1.5px), hairline dividers, mounts and white space, never from cards, gradients or glow. Type is a single grotesque used at two extremes: heavy, tightly tracked headlines and plain medium-weight UI. The only hand-drawn element is the tape label. Density is generous on the landing page and calm but working in the signed-in app, which inherits the same world at a quieter volume.\n\nMotion is reserved for the mount. On the landing page a mount turns over to show its reading; in the app, opening a photo lifts its mount off the table into the dialog. Nothing else is choreographed.",
+    "keyCharacteristics": [
+      "Backlit white / unlit charcoal table, grey slide mounts around every photo.",
+      "Flash yellow only as a fill under ink: the primary action, tape labels, text selection.",
+      "Hanken Grotesk 900 for headlines, 500 to 600 for UI; Kalam 700 only on tape.",
+      "One structural line weight (1.5px ink), plus 1px hairlines for dividers and fields.",
+      "Near-square corners; mounts and tape are fully square.",
+      "One authored motion per surface, always about the mount."
+    ],
+    "rules": [
+      {
+        "name": "The Flash Under Ink Rule",
+        "body": "Yellow is only ever a fill with Marker Ink (oklch(0.2 0 0)) on top. It is never text, never a line on white, never an icon colour, never a data bar.",
+        "section": "colors"
+      },
+      {
+        "name": "The Photos Are The Colour Rule",
+        "body": "Apart from yellow and the destructive red, the UI is achromatic. If a screen looks colourful, the colour should be coming from the photographs.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Data Rule",
+        "body": "Bars and quantities are drawn in foreground ink on a Table Wash track. Yellow labels a group; it never measures one.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Hand Rule",
+        "body": "Kalam appears only inside a tape label. Headings, buttons, captions and empty states never borrow it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Count Rule",
+        "body": "Numbers in tables, times and counts (`data-numeric`) use tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Table Rule",
+        "body": "Nothing on the table casts a shadow. Mounts, tape, buttons and sections stay flat; only overlays float.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put every photo in a Slide Mount, square, with the photo contained, never cropped to fill.",
+      "**Do** use Flash Yellow (oklch(0.852 0.199 91.936)) only as a fill under Marker Ink: one primary action per view, tape labels, selection.",
+      "**Do** separate sections with a 1.5px ink rule under a heavy title, and rows with 1px hairlines.",
+      "**Do** set headlines in Hanken Grotesk 900 with negative tracking (-0.035em to -0.04em) and keep them visually lighter than the photos beside them.",
+      "**Do** draw quantities in foreground ink on a Table Wash track.",
+      "**Do** give every authored motion a reduced-motion fallback (cross-fade or instant).",
+      "**Do** keep dark mode the same table unlit: same yellow, mounts one step above the page."
+    ],
+    "donts": [
+      "**Don't** set yellow text, yellow lines or yellow icons on white, and don't colour data bars yellow.",
+      "**Don't** use Kalam outside a tape label.",
+      "**Don't** add gradients, glows or soft halos; the only shadow is the tight Float under overlays.",
+      "**Don't** wrap content in rounded, shadowed cards; use mounts, rules and space.",
+      "**Don't** add a second orchestrated transition; motion belongs to the mount.",
+      "**Don't** round mounts, tape, chips or bars."
+    ]
+  }
+}
